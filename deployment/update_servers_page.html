@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Te🖐️AI - AIによる開発支援プラットフォームのサーバー管理">
+    <title>サーバー管理 - Te🖐️AI</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e11d48;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .logo img {
+            height: 2.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        /* Servers Table */
+        .servers-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .servers-table th,
+        .servers-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .servers-table th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .servers-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .servers-table tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-running {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .status-stopped {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--accent-color);
+        }
+
+        .status-pending {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .empty-state-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            position: relative;
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Alert */
+        .alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-danger {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        /* Server Card */
+        .server-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .server-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .server-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .server-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .server-card-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .server-card-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .server-card-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-card-info-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .server-card-info-value {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .server-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .server-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .server-url {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        .server-url svg {
+            margin-right: 0.5rem;
+        }
+
+        .server-url:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .servers-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .server-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="alert-container" class="alert-container"></div>
+
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                    Te🖐️AI
+                </a>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">ダッシュボード</a>
+                    <a href="/servers.html" class="nav-link active">サーバー管理</a>
+                    <a href="#" class="nav-link">設定</a>
+                    <button id="logout-btn" class="btn btn-primary btn-sm">ログアウト</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">サーバー管理</h1>
+                <button id="create-server-btn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    新規サーバー作成
+                </button>
+            </div>
+
+            <div id="servers-list-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⏳</div>
+                    <h3 class="empty-state-title">読み込み中...</h3>
+                    <p class="empty-state-description">サーバー情報を取得しています。しばらくお待ちください。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Server Modal -->
+    <div id="create-server-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新規サーバー作成</h2>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-server-form">
+                    <div class="form-group">
+                        <label for="server-region" class="form-label">リージョン</label>
+                        <select id="server-region" class="form-select" required>
+                            <option value="ap-northeast-1">東京 (ap-northeast-1)</option>
+                            <option value="us-east-1">バージニア (us-east-1)</option>
+                            <option value="us-west-2">オレゴン (us-west-2)</option>
+                            <option value="eu-west-1">アイルランド (eu-west-1)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="server-type" class="form-label">インスタンスタイプ</label>
+                        <select id="server-type" class="form-select" required>
+                            <option value="t3a.large">t3a.large (2 vCPU, 8 GB RAM)</option>
+                            <option value="t3a.xlarge">t3a.xlarge (4 vCPU, 16 GB RAM)</option>
+                            <option value="t3a.2xlarge">t3a.2xlarge (8 vCPU, 32 GB RAM)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="server-storage" class="form-label">ストレージ (GB)</label>
+                        <select id="server-storage" class="form-select" required>
+                            <option value="30">30 GB</option>
+                            <option value="50">50 GB</option>
+                            <option value="100">100 GB</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-close btn btn-secondary">キャンセル</button>
+                <button id="create-server-submit" class="btn btn-primary">作成</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const token = localStorage.getItem('teai_token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // サーバー一覧を取得
+            fetchServers();
+
+            // ログアウトボタン
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('teai_token');
+                localStorage.removeItem('teai_user');
+                window.location.href = '/login.html';
+            });
+
+            // 新規サーバー作成ボタン
+            const createServerBtn = document.getElementById('create-server-btn');
+            const createServerModal = document.getElementById('create-server-modal');
+            const modalCloseButtons = document.querySelectorAll('.modal-close');
+
+            createServerBtn.addEventListener('click', function() {
+                createServerModal.classList.add('active');
+            });
+
+            modalCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    createServerModal.classList.remove('active');
+                });
+            });
+
+            // 新規サーバー作成フォーム送信
+            const createServerSubmit = document.getElementById('create-server-submit');
+            const createServerForm = document.getElementById('create-server-form');
+
+            createServerSubmit.addEventListener('click', function() {
+                if (createServerForm.checkValidity()) {
+                    const region = document.getElementById('server-region').value;
+                    const type = document.getElementById('server-type').value;
+                    const storage = document.getElementById('server-storage').value;
+
+                    createServer(region, type, storage);
+                } else {
+                    createServerForm.reportValidity();
+                }
+            });
+        });
+
+        function fetchServers() {
+            const token = localStorage.getItem('teai_token');
+            const serversListContainer = document.getElementById('servers-list-container');
+
+            fetch('/api/servers', {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderServersList(data.servers);
+                } else {
+                    showAlert('danger', data.message || 'サーバー一覧の取得に失敗しました。');
+                    serversListContainer.innerHTML = '<div class="alert alert-danger">サーバー一覧の取得に失敗しました。</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバー一覧の取得中にエラーが発生しました。');
+                serversListContainer.innerHTML = '<div class="alert alert-danger">サーバー一覧の取得中にエラーが発生しました。</div>';
+            });
+        }
+
+        function renderServersList(servers) {
+            const serversListContainer = document.getElementById('servers-list-container');
+
+            if (servers.length === 0) {
+                serversListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🖥️</div>
+                        <h3 class="empty-state-title">サーバーがありません</h3>
+                        <p class="empty-state-description">新規サーバーを作成して、Te🖐️AIプラットフォームを利用しましょう。</p>
+                        <button id="empty-create-server-btn" class="btn btn-primary">新規サーバー作成</button>
+                    </div>
+                `;
+
+                document.getElementById('empty-create-server-btn').addEventListener('click', function() {
+                    document.getElementById('create-server-modal').classList.add('active');
+                });
+
+                return;
+            }
+
+            // サーバーカードビューを使用
+            let html = '<div class="server-grid">';
+
+            servers.forEach(server => {
+                const statusClass = getStatusClass(server.Status);
+                const launchTime = new Date(server.LaunchTime).toLocaleString('ja-JP');
+
+                html += `
+                    <div class="server-card">
+                        <div class="server-card-header">
+                            <h3 class="server-card-title">サーバー ${server.ID.substring(0, 8)}...</h3>
+                            <span class="status-badge ${statusClass}">${server.Status || 'Unknown'}</span>
+                        </div>
+                        <div class="server-card-body">
+                            <div class="server-card-info">
+                                <div class="server-card-info-item">
+                                    <span class="server-card-info-label">IPアドレス</span>
+                                    <span class="server-card-info-value">${server.IP || 'N/A'}</span>
+                                </div>
+                                <div class="server-card-info-item">
+                                    <span class="server-card-info-label">タイプ</span>
+                                    <span class="server-card-info-value">${server.Type || 'N/A'}</span>
+                                </div>
+                                <div class="server-card-info-item">
+                                    <span class="server-card-info-label">リージョン</span>
+                                    <span class="server-card-info-value">${server.Region || 'N/A'}</span>
+                                </div>
+                                <div class="server-card-info-item">
+                                    <span class="server-card-info-label">ストレージ</span>
+                                    <span class="server-card-info-value">${server.Storage || 'N/A'} GB</span>
+                                </div>
+                            </div>
+                            <div class="server-card-info-item" style="margin-top: 1rem;">
+                                <span class="server-card-info-label">起動時間</span>
+                                <span class="server-card-info-value">${launchTime}</span>
+                            </div>
+                            <a href="${server.URL || '#'}" target="_blank" class="server-url">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                ${server.Subdomain || 'サーバーURL'}
+                            </a>
+                        </div>
+                        <div class="server-card-footer">
+                            <div class="server-card-actions">
+                                <button class="btn btn-primary btn-sm" onclick="restartServer('${server.ID}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" class="btn-icon">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    再起動
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="stopServer('${server.ID}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" class="btn-icon">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                    </svg>
+                                    停止
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteServer('${server.ID}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16" class="btn-icon">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    削除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            serversListContainer.innerHTML = html;
+        }
+
+        function getStatusClass(status) {
+            status = status ? status.toLowerCase() : '';
+            if (status === 'running') return 'status-running';
+            if (status === 'stopped') return 'status-stopped';
+            return 'status-pending';
+        }
+
+        function createServer(region, type, storage) {
+            const token = localStorage.getItem('teai_token');
+            const createServerModal = document.getElementById('create-server-modal');
+            const createServerSubmit = document.getElementById('create-server-submit');
+
+            createServerSubmit.disabled = true;
+            createServerSubmit.textContent = '作成中...';
+
+            fetch('/api/servers', {
+                method: 'POST',
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    region: region,
+                    type: type,
+                    storage: storage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', `新規サーバーを作成しました。サブドメイン: ${data.server.subdomain}`);
+                    createServerModal.classList.remove('active');
+                    fetchServers();
+                    
+                    // サーバーが作成されたら、OpenHandsへのリンクを表示
+                    setTimeout(() => {
+                        showAlert('success', `OpenHandsが利用可能になりました。<a href="${data.server.url}" target="_blank">こちら</a>からアクセスできます。`);
+                    }, 3000);
+                } else {
+                    showAlert('danger', data.message || 'サーバーの作成に失敗しました。');
+                }
+                createServerSubmit.disabled = false;
+                createServerSubmit.textContent = '作成';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバーの作成中にエラーが発生しました。');
+                createServerSubmit.disabled = false;
+                createServerSubmit.textContent = '作成';
+            });
+        }
+
+        function deleteServer(serverId) {
+            const token = localStorage.getItem('teai_token');
+
+            if (!confirm(`サーバー ${serverId} を削除してもよろしいですか？`)) {
+                return;
+            }
+
+            fetch(`/api/servers/${serverId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', `サーバー ${serverId} を削除しました。`);
+                    fetchServers();
+                } else {
+                    showAlert('danger', data.message || 'サーバーの削除に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバーの削除中にエラーが発生しました。');
+            });
+        }
+
+        function restartServer(serverId) {
+            const token = localStorage.getItem('teai_token');
+
+            fetch(`/api/servers/${serverId}/restart`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', `サーバー ${serverId} を再起動しました。`);
+                    fetchServers();
+                } else {
+                    showAlert('danger', data.message || 'サーバーの再起動に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバーの再起動中にエラーが発生しました。');
+            });
+        }
+
+        function stopServer(serverId) {
+            const token = localStorage.getItem('teai_token');
+
+            fetch(`/api/servers/${serverId}/stop`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', `サーバー ${serverId} を停止しました。`);
+                    fetchServers();
+                } else {
+                    showAlert('danger', data.message || 'サーバーの停止に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバーの停止中にエラーが発生しました。');
+            });
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+
+            alertContainer.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
