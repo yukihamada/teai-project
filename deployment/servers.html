@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TeAI - サーバー管理画面">
+    <title>サーバー管理 - TeAI</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 2rem;
+            margin-right: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e11d48;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            color: var(--text-light);
+        }
+
+        /* Server List */
+        .server-list {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .server-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .server-table th,
+        .server-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .server-table th {
+            background-color: var(--bg-light);
+            font-weight: 600;
+        }
+
+        .server-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .server-table tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-unreachable {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-no-ip {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Memory Bar */
+        .memory-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .memory-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .memory-text {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .server-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/logo.svg" alt="TeAI Logo">
+                    TeAI
+                </a>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">ダッシュボード</a>
+                    <a href="/servers.html" class="nav-link">サーバー管理</a>
+                    <a href="/settings.html" class="nav-link">設定</a>
+                    <button id="logout-btn" class="btn btn-primary">ログアウト</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">サーバー管理</h1>
+                <p class="page-description">現在稼働中のサーバー一覧を表示します。</p>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <div id="server-list-container" class="server-list">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // トークンを取得
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // サーバー一覧を取得
+            fetchServers();
+
+            // ログアウトボタン
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+            });
+        });
+
+        function fetchServers() {
+            const token = localStorage.getItem('token');
+            const serverListContainer = document.getElementById('server-list-container');
+
+            fetch('/api/servers', {
+                method: 'GET',
+                headers: {
+                    'Authorization': token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderServerList(data.servers);
+                } else {
+                    showAlert('danger', data.message || 'サーバー一覧の取得に失敗しました。');
+                    serverListContainer.innerHTML = '<div class="alert alert-danger">サーバー一覧の取得に失敗しました。</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'サーバー一覧の取得中にエラーが発生しました。');
+                serverListContainer.innerHTML = '<div class="alert alert-danger">サーバー一覧の取得中にエラーが発生しました。</div>';
+            });
+        }
+
+        function renderServerList(servers) {
+            const serverListContainer = document.getElementById('server-list-container');
+            
+            if (servers.length === 0) {
+                serverListContainer.innerHTML = '<div class="alert alert-info">サーバーが見つかりませんでした。</div>';
+                return;
+            }
+
+            let html = `
+                <table class="server-table">
+                    <thead>
+                        <tr>
+                            <th>インスタンスID</th>
+                            <th>IPアドレス</th>
+                            <th>ステータス</th>
+                            <th>タイプ</th>
+                            <th>メモリ使用量</th>
+                            <th>起動時間</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            servers.forEach(server => {
+                const statusClass = getStatusClass(server.Status);
+                const memoryUsage = getMemoryUsage(server.Memory);
+                const launchTime = new Date(server.LaunchTime).toLocaleString('ja-JP');
+
+                html += `
+                    <tr>
+                        <td>${server.ID}</td>
+                        <td>${server.IP || 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${server.Status || 'Unknown'}</span></td>
+                        <td>${server.Type || 'N/A'}</td>
+                        <td>
+                            ${memoryUsage ? `
+                                <div class="memory-bar-container">
+                                    <div class="memory-bar" style="width: ${memoryUsage.percentage}%"></div>
+                                </div>
+                                <div class="memory-text">${memoryUsage.used}MB / ${memoryUsage.total}MB (${memoryUsage.percentage}%)</div>
+                            ` : 'N/A'}
+                        </td>
+                        <td>${launchTime}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="viewLogs('${server.ID}', '${server.IP}')">ログ</button>
+                            <button class="btn btn-sm btn-secondary" onclick="restartServer('${server.ID}', '${server.IP}')">再起動</button>
+                            <button class="btn btn-sm btn-danger" onclick="stopServer('${server.ID}')">停止</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            serverListContainer.innerHTML = html;
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'Running':
+                    return 'status-running';
+                case 'Error':
+                    return 'status-error';
+                case 'Unreachable':
+                    return 'status-unreachable';
+                case 'No IP':
+                    return 'status-no-ip';
+                default:
+                    return '';
+            }
+        }
+
+        function getMemoryUsage(memory) {
+            if (!memory) return null;
+
+            const total = parseInt(memory.Total);
+            const used = parseInt(memory.Used);
+            const percentage = Math.round((used / total) * 100);
+
+            return {
+                total,
+                used,
+                percentage
+            };
+        }
+
+        function viewLogs(instanceId, ip) {
+            alert(`インスタンス ${instanceId} (${ip}) のログを表示します。この機能は現在開発中です。`);
+        }
+
+        function restartServer(instanceId, ip) {
+            if (confirm(`インスタンス ${instanceId} (${ip}) を再起動しますか？`)) {
+                alert(`インスタンス ${instanceId} の再起動を開始しました。この機能は現在開発中です。`);
+            }
+        }
+
+        function stopServer(instanceId) {
+            if (confirm(`インスタンス ${instanceId} を停止しますか？`)) {
+                alert(`インスタンス ${instanceId} の停止を開始しました。この機能は現在開発中です。`);
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertContainer = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
