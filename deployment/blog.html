@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Te🖐️AI - OpenHandsをクラウドで簡単に使えるようにしたサービス">
+    <title>OpenHandsをクラウドで簡単に使う - Te🖐️AI</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+            --container-width: 800px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .logo img {
+            height: 2.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* Blog */
+        .blog {
+            padding: 4rem 0;
+        }
+
+        .blog-header {
+            margin-bottom: 2rem;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .blog-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-author-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .blog-author-name {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .blog-date {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .blog-date svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .blog-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .blog-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .blog-content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .blog-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-color);
+        }
+
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .blog-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-content img {
+            max-width: 100%;
+            border-radius: var(--border-radius);
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .blog-content blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .blog-content code {
+            font-family: monospace;
+            background-color: var(--bg-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .blog-content pre {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .blog-content pre code {
+            background-color: transparent;
+            color: white;
+            padding: 0;
+        }
+
+        .blog-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .blog-tag {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .blog-tag:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .blog-share {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .blog-share-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .blog-share-links {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .blog-share-link {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .blog-share-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .blog-share-link svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        /* Related Posts */
+        .related-posts {
+            margin-top: 4rem;
+        }
+
+        .related-posts-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .related-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .related-post {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .related-post:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .related-post-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .related-post-content {
+            padding: 1.5rem;
+        }
+
+        .related-post-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .related-post-excerpt {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .related-post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: white;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 2rem;
+            margin-right: 0.75rem;
+        }
+
+        .footer-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social-link {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .footer-social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-social-link svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .footer-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-link a {
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .footer-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-link {
+            color: var(--text-light);
+        }
+
+        .footer-bottom-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 0;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .blog-title {
+                font-size: 2rem;
+            }
+
+            .blog {
+                padding: 3rem 0;
+            }
+
+            .related-posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                    Te🖐️AI
+                </a>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">特徴</a>
+                    <a href="#" class="nav-link">料金</a>
+                    <a href="/faq.html" class="nav-link">FAQ</a>
+                    <a href="/contact.html" class="nav-link">お問い合わせ</a>
+                    <a href="/login.html" class="nav-link">ログイン</a>
+                    <a href="/register.html" class="btn btn-primary">無料で始める</a>
+                </div>
+                <button class="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="blog">
+        <div class="container">
+            <div class="blog-header">
+                <h1 class="blog-title">OpenHandsをクラウドで簡単に使えるようにしました</h1>
+                <div class="blog-meta">
+                    <div class="blog-author">
+                        <img src="https://avatars.githubusercontent.com/u/3401517?v=4" alt="Hamada" class="blog-author-avatar">
+                        <div>
+                            <div class="blog-author-name">Hamada</div>
+                            <div>イネブラ</div>
+                        </div>
+                    </div>
+                    <div class="blog-date">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        2025年3月26日
+                    </div>
+                </div>
+                <div class="blog-tags">
+                    <a href="#" class="blog-tag">OpenHands</a>
+                    <a href="#" class="blog-tag">OpenDevin</a>
+                    <a href="#" class="blog-tag">AI</a>
+                    <a href="#" class="blog-tag">開発支援</a>
+                    <a href="#" class="blog-tag">クラウドサービス</a>
+                </div>
+            </div>
+
+            <div class="blog-content">
+                <p>皆さん、はじめまして。イネブラのHamadaと申します。ChatGPTが誕生して以来、AIに夢中でいろいろなツールを作ったり使ったりしてきました。今日は、最近特に注目しているオープンソースのAIエンジニアリングアシスタント「OpenHands」について、そしてそれをクラウドで簡単に使えるようにした新サービス「Te🖐️AI」についてご紹介します。</p>
+
+                <h2>OpenHandsの素晴らしさと課題</h2>
+                <p>OpenHandsは、Devin（AIエンジニア）のオープンソース版であるOpenDevinをベースにした、非常に強力なAIエンジニアリングアシスタントです。コードの生成、デバッグ、テスト、デプロイなど、開発プロセス全体をサポートしてくれる素晴らしいツールです。</p>
+
+                <p>しかし、OpenHandsを使うには、環境構築やセットアップが必要で、特に以下のような課題がありました：</p>
+
+                <ul>
+                    <li>Dockerやその他の依存関係のインストールが必要</li>
+                    <li>GPUを搭載した高性能マシンが必要</li>
+                    <li>設定ファイルの編集や環境変数の設定など、技術的な知識が必要</li>
+                    <li>アップデートやメンテナンスを自分で行う必要がある</li>
+                </ul>
+
+                <p>これらの課題は、特に開発初心者や、「とにかくすぐに使いたい」という方にとっては大きな障壁となっていました。</p>
+
+                <h2>Te🖐️AI - OpenHandsをクラウドで</h2>
+                <p>そこで私は、OpenHandsをクラウドで簡単に使えるようにするサービス「Te🖐️AI」を開発しました。Te🖐️AIを使えば、複雑なセットアップなしで、ブラウザからすぐにOpenHandsの機能を利用できます。</p>
+
+                <p>Te🖐️AIの主な特徴は以下の通りです：</p>
+
+                <ul>
+                    <li><strong>簡単なセットアップ</strong>：アカウント登録後、数クリックでOpenHandsを起動できます</li>
+                    <li><strong>スケーラブルなリソース</strong>：必要に応じてコンピューティングリソースを調整できます</li>
+                    <li><strong>自動アップデート</strong>：常に最新バージョンのOpenHandsを利用できます</li>
+                    <li><strong>セキュアな環境</strong>：エンドツーエンドの暗号化とセキュアなクラウド環境でコードとデータを保護します</li>
+                    <li><strong>チーム連携</strong>：チームメンバーと簡単に連携し、AIアシスタントの知見を共有できます</li>
+                </ul>
+
+                <h2>Te🖐️AIの使い方</h2>
+                <p>Te🖐️AIの使い方は非常に簡単です。以下の手順で始められます：</p>
+
+                <h3>1. アカウント登録</h3>
+                <p><a href="https://teai.io/register.html">登録ページ</a>からアカウントを作成します。メールアドレスで簡単に登録でき、無料トライアルを利用できます。</p>
+
+                <h3>2. サーバーを起動</h3>
+                <p>ダッシュボードから「新規サーバー作成」ボタンをクリックし、必要なスペックを選択します。数分でOpenHandsが利用可能になります。</p>
+
+                <h3>3. 開発を加速</h3>
+                <p>起動したサーバーのURLにアクセスすると、OpenHandsのインターフェースが表示されます。あとは自然言語で指示を出すだけで、コード生成、デバッグ、テスト、デプロイなどの作業を効率化できます。</p>
+
+                <h2>実際の使用例</h2>
+                <p>私自身、Te🖐️AIを使って様々なプロジェクトを進めていますが、特に以下のような場面で効果を発揮しています：</p>
+
+                <ul>
+                    <li><strong>新機能の実装</strong>：「ユーザー認証機能を追加して」と指示するだけで、必要なコードを生成してくれます</li>
+                    <li><strong>バグ修正</strong>：エラーメッセージを共有するだけで、原因を特定し修正案を提示してくれます</li>
+                    <li><strong>コードレビュー</strong>：既存のコードを分析し、改善点や最適化の提案をしてくれます</li>
+                    <li><strong>ドキュメント作成</strong>：コードからAPIドキュメントやREADMEを自動生成してくれます</li>
+                </ul>
+
+                <p>特に印象的だったのは、「Reactでドラッグ＆ドロップのカンバンボードを作って」と指示したときの反応です。OpenHandsは単にコードを生成するだけでなく、コンポーネント設計の説明、状態管理の方法、さらにはパフォーマンス最適化のヒントまで提供してくれました。まるで経験豊富な先輩エンジニアがペアプログラミングしてくれているような感覚でした。</p>
+
+                <h2>今後の展望</h2>
+                <p>Te🖐️AIは現在も開発を続けており、今後は以下のような機能を追加していく予定です：</p>
+
+                <ul>
+                    <li>チーム向けの共同編集機能</li>
+                    <li>プロジェクト管理ツールとの連携</li>
+                    <li>カスタムモデルのサポート</li>
+                    <li>より高度なコード解析と提案機能</li>
+                </ul>
+
+                <p>私の目標は、「こういうサービスがあったらいいのに」と思ったことが一発で実現できるようなサービスを作ることです。Te🖐️AIがその一歩になればと思っています。</p>
+
+                <h2>まとめ</h2>
+                <p>OpenHandsは素晴らしいツールですが、セットアップの複雑さが障壁となっていました。Te🖐️AIはその障壁を取り除き、誰でも簡単にOpenHandsの力を活用できるようにするサービスです。</p>
+
+                <p>AIの力を借りて開発効率を劇的に向上させたい方、新しい技術にチャレンジしたい方、ぜひTe🖐️AIを試してみてください。これからも期待に応えられるサービスに育てていきますので、フィードバックもお待ちしています。</p>
+
+                <div class="blog-share">
+                    <div class="blog-share-title">この記事をシェア：</div>
+                    <div class="blog-share-links">
+                        <a href="#" class="blog-share-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="blog-share-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="blog-share-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="related-posts">
+                <h2 class="related-posts-title">関連記事</h2>
+                <div class="related-posts-grid">
+                    <a href="#" class="related-post">
+                        <img src="/static/images/teai-dashboard.png" alt="AIと開発効率" class="related-post-image">
+                        <div class="related-post-content">
+                            <h3 class="related-post-title">AIを活用した開発効率の向上</h3>
+                            <p class="related-post-excerpt">AIツールを活用して開発効率を向上させる方法について解説します。コード生成からデバッグまで、AIが開発プロセスをどのように変革するかを紹介します。</p>
+                            <div class="related-post-meta">
+                                <div>Hamada</div>
+                                <div>2025年3月15日</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="related-post">
+                        <img src="/static/images/teai-dashboard.png" alt="オープンソースAI" class="related-post-image">
+                        <div class="related-post-content">
+                            <h3 class="related-post-title">オープンソースAIの可能性</h3>
+                            <p class="related-post-excerpt">オープンソースAIの現状と将来性について考察します。OpenDevinやLlamaなど、注目のオープンソースAIプロジェクトを紹介します。</p>
+                            <div class="related-post-meta">
+                                <div>Hamada</div>
+                                <div>2025年3月10日</div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="related-post">
+                        <img src="/static/images/teai-dashboard.png" alt="クラウドサービス開発" class="related-post-image">
+                        <div class="related-post-content">
+                            <h3 class="related-post-title">クラウドサービス開発のベストプラクティス</h3>
+                            <p class="related-post-excerpt">クラウドサービスを開発する際のベストプラクティスについて解説します。スケーラビリティ、セキュリティ、パフォーマンスなど、重要な要素を網羅します。</p>
+                            <div class="related-post-meta">
+                                <div>Hamada</div>
+                                <div>2025年3月5日</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/" class="footer-logo">
+                        <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                        Te🖐️AI
+                    </a>
+                    <p class="footer-description">オープンソースのAIエンジニアリングアシスタント「OpenHands」をクラウドで簡単に利用できるSaaSプラットフォーム。</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">製品</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">特徴</a></li>
+                        <li class="footer-link"><a href="#">料金</a></li>
+                        <li class="footer-link"><a href="/register.html">無料で始める</a></li>
+                        <li class="footer-link"><a href="/login.html">ログイン</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">リソース</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">ドキュメント</a></li>
+                        <li class="footer-link"><a href="#">ブログ</a></li>
+                        <li class="footer-link"><a href="/faq.html">よくある質問</a></li>
+                        <li class="footer-link"><a href="#">チュートリアル</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">会社情報</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">会社概要</a></li>
+                        <li class="footer-link"><a href="/contact.html">お問い合わせ</a></li>
+                        <li class="footer-link"><a href="#">採用情報</a></li>
+                        <li class="footer-link"><a href="#">プレスキット</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2025 Te🖐️AI. All rights reserved.</div>
+                <div class="footer-bottom-links">
+                    <a href="#" class="footer-bottom-link">利用規約</a>
+                    <a href="#" class="footer-bottom-link">プライバシーポリシー</a>
+                    <a href="#" class="footer-bottom-link">クッキーポリシー</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            });
+        }
+    </script>
+</body>
+</html>
