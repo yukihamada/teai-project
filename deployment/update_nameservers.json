@@ -1,0 +1,17 @@
+{
+  "DomainName": "teai.io",
+  "Nameservers": [
+    {
+      "Name": "ns-1694.awsdns-19.co.uk"
+    },
+    {
+      "Name": "ns-1109.awsdns-10.org"
+    },
+    {
+      "Name": "ns-563.awsdns-06.net"
+    },
+    {
+      "Name": "ns-69.awsdns-08.com"
+    }
+  ]
+}
