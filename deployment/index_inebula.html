@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeAI - 株式会社イネブラ | AIによる開発支援プラットフォーム</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: white;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .hero {
+            padding: 150px 0 100px;
+            text-align: center;
+            background-color: var(--light-bg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(46, 204, 113, 0.05) 100%);
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #7f8c8d;
+        }
+        
+        .features {
+            padding: 100px 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h3 {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .section-title p {
+            font-size: 18px;
+            color: #7f8c8d;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .feature-card p {
+            color: #7f8c8d;
+        }
+        
+        .sustainability {
+            padding: 100px 0;
+            background-color: var(--light-bg);
+            position: relative;
+        }
+        
+        .sustainability::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(52, 152, 219, 0.05) 100%);
+            z-index: 0;
+        }
+        
+        .sustainability-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sustainability-text {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 40px;
+        }
+        
+        .sustainability-text h3 {
+            font-size: 36px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .sustainability-text p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .sustainability-points {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .sustainability-point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .sustainability-point-icon {
+            font-size: 24px;
+            color: var(--secondary-color);
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .sustainability-point-text h4 {
+            font-size: 20px;
+            color: var(--text-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .sustainability-point-text p {
+            color: #7f8c8d;
+        }
+        
+        .cta {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .cta p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+        
+        .btn-white {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .btn-white:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+        
+        .company {
+            padding: 100px 0;
+            background-color: white;
+        }
+        
+        .company-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .company-details {
+            flex: 1;
+            min-width: 300px;
+            padding-right: 40px;
+        }
+        
+        .company-details h3 {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .company-details p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .company-table {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .info-table tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .info-table th {
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            width: 30%;
+        }
+        
+        .info-table td {
+            padding: 15px 10px;
+            color: #7f8c8d;
+        }
+        
+        footer {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ecf0f1;
+            font-weight: 600;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #4a6278;
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 20px;
+            }
+            
+            .nav-links li {
+                margin: 0 15px;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .section-title h3 {
+                font-size: 30px;
+            }
+            
+            .sustainability-text,
+            .sustainability-points,
+            .company-details,
+            .company-table {
+                padding-right: 0;
+                margin-bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">機能</a></li>
+                    <li><a href="#sustainability">持続可能性</a></li>
+                    <li><a href="#company">会社情報</a></li>
+                    <li><a href="/login.html" class="btn">ログイン</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>AIの手で、コーディングをもっと簡単に</h2>
+                <p>TeAI（テアイ）は、株式会社イネブラが提供するAIを活用した開発支援プラットフォームです。コーディング、デバッグ、リファクタリングなど、開発者の日常的なタスクをAIがサポートします。</p>
+                <a href="/register.html" class="btn">無料で始める</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h3>TeAIの主な機能</h3>
+                <p>開発者の生産性を高める、TeAIの主な機能をご紹介します。</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h4>コード生成</h4>
+                    <p>自然言語での指示からコードを生成します。アイデアを素早くコードに変換し、開発時間を短縮します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🐛</div>
+                    <h4>デバッグ支援</h4>
+                    <p>エラーの原因を特定し、修正案を提案します。複雑なバグも素早く解決できます。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>リファクタリング</h4>
+                    <p>コードの品質向上のための提案と自動修正を行います。より読みやすく、メンテナンスしやすいコードに改善します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h4>ドキュメント生成</h4>
+                    <p>コードからドキュメントを自動生成します。コメントやREADMEファイルの作成を効率化します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎓</div>
+                    <h4>学習支援</h4>
+                    <p>プログラミング学習のためのガイダンスと説明を提供します。新しい言語やフレームワークの習得をサポートします。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h4>コードレビュー</h4>
+                    <p>コードの問題点や改善点を指摘します。品質の高いコードを維持するためのサポートを提供します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sustainability" id="sustainability">
+        <div class="container">
+            <div class="sustainability-content">
+                <div class="sustainability-text">
+                    <h3>持続可能なサービス設計</h3>
+                    <p>TeAIは、長期的な視点で設計された持続可能なサービスです。環境への配慮、エネルギー効率、そして開発者の生産性向上を通じて、より良い未来の創造に貢献します。</p>
+                    <p>私たちは、AIの力を活用しながらも、人間中心の開発プロセスを大切にしています。TeAIは開発者の創造性を引き出し、より効率的で持続可能なソフトウェア開発を実現します。</p>
+                </div>
+                <div class="sustainability-points">
+                    <div class="sustainability-point">
+                        <div class="sustainability-point-icon">🌱</div>
+                        <div class="sustainability-point-text">
+                            <h4>環境に配慮したインフラ</h4>
+                            <p>エネルギー効率の高いクラウドインフラを採用し、カーボンフットプリントの削減に努めています。</p>
+                        </div>
+                    </div>
+                    <div class="sustainability-point">
+                        <div class="sustainability-point-icon">⚡</div>
+                        <div class="sustainability-point-text">
+                            <h4>効率的なリソース利用</h4>
+                            <p>AIモデルの最適化により、必要最小限のコンピューティングリソースで最大の効果を発揮します。</p>
+                        </div>
+                    </div>
+                    <div class="sustainability-point">
+                        <div class="sustainability-point-icon">♻️</div>
+                        <div class="sustainability-point-text">
+                            <h4>コード再利用の促進</h4>
+                            <p>既存コードの再利用を促進し、開発の無駄を減らすことで、持続可能な開発プラクティスを支援します。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h3>今すぐTeAIを試してみませんか？</h3>
+            <p>無料プランで始めて、TeAIの機能を体験してください。チームプランやエンタープライズプランもご用意しています。</p>
+            <a href="/register.html" class="btn btn-white">無料で始める</a>
+        </div>
+    </section>
+
+    <section class="company" id="company">
+        <div class="container">
+            <div class="section-title">
+                <h3>会社情報</h3>
+                <p>TeAIを提供する株式会社イネブラについてご紹介します。</p>
+            </div>
+            <div class="company-info">
+                <div class="company-details">
+                    <h3>株式会社イネブラ</h3>
+                    <p>株式会社イネブラは、最先端のAI技術を活用して、開発者の生産性向上と持続可能なソフトウェア開発を支援する企業です。</p>
+                    <p>私たちは、テクノロジーの力で人々の創造性を引き出し、より良い未来を創造することを使命としています。TeAIは、その使命を実現するための重要なプロダクトです。</p>
+                    <p>イネブラは「Innovation in Nebula（星雲の中のイノベーション）」を意味し、無限の可能性を秘めた宇宙のように、常に新しいアイデアと技術を探求し続けます。</p>
+                </div>
+                <div class="company-table">
+                    <table class="info-table">
+                        <tr>
+                            <th>会社名</th>
+                            <td>株式会社イネブラ</td>
+                        </tr>
+                        <tr>
+                            <th>設立</th>
+                            <td>2022年4月</td>
+                        </tr>
+                        <tr>
+                            <th>代表取締役</th>
+                            <td>星野 智明</td>
+                        </tr>
+                        <tr>
+                            <th>所在地</th>
+                            <td>東京都渋谷区神宮前5-52-2 青山オーバルビル4F</td>
+                        </tr>
+                        <tr>
+                            <th>事業内容</th>
+                            <td>AI開発支援プラットフォームの開発・提供<br>ソフトウェア開発支援サービス<br>AI技術の研究開発</td>
+                        </tr>
+                        <tr>
+                            <th>従業員数</th>
+                            <td>35名（2025年3月現在）</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>TeAI</h4>
+                    <ul>
+                        <li><a href="#features">機能</a></li>
+                        <li><a href="#sustainability">持続可能性</a></li>
+                        <li><a href="#company">会社情報</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>サービス</h4>
+                    <ul>
+                        <li><a href="#">料金プラン</a></li>
+                        <li><a href="#">エンタープライズ</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">パートナー</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>リソース</h4>
+                    <ul>
+                        <li><a href="#">ドキュメント</a></li>
+                        <li><a href="#">チュートリアル</a></li>
+                        <li><a href="#">ブログ</a></li>
+                        <li><a href="#">コミュニティ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>お問い合わせ</h4>
+                    <ul>
+                        <li><a href="#">サポート</a></li>
+                        <li><a href="#">営業窓口</a></li>
+                        <li><a href="#">採用情報</a></li>
+                        <li><a href="#">メディア</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 株式会社イネブラ All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

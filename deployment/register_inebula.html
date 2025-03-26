@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新規登録 - TeAI | 株式会社イネブラ</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        main {
+            flex: 1;
+            padding-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 40px;
+        }
+        
+        .register-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .register-logo {
+            margin-bottom: 30px;
+        }
+        
+        .register-logo img {
+            height: 60px;
+        }
+        
+        .register-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-check input {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+        
+        .form-check label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .form-check a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .form-check a:hover {
+            text-decoration: underline;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .login-link {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .login-link a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .register-separator {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .register-separator::before,
+        .register-separator::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .register-separator span {
+            padding: 0 10px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .social-register {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--light-bg);
+            transition: all 0.3s;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .social-btn img {
+            width: 24px;
+            height: 24px;
+        }
+        
+        footer {
+            background-color: white;
+            padding: 20px 0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .register-container {
+                padding: 30px 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/#features">機能</a></li>
+                    <li><a href="/#company">会社情報</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="register-container">
+            <div class="register-logo">
+                <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+            </div>
+            <h2 class="register-title">TeAIに新規登録</h2>
+            <form id="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first-name">姓</label>
+                        <input type="text" id="first-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">名</label>
+                        <input type="text" id="last-name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">メールアドレス</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">ユーザー名</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">パスワード（確認）</label>
+                    <input type="password" id="confirm-password" class="form-control" required>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        <a href="#">利用規約</a>と<a href="#">プライバシーポリシー</a>に同意します。
+                    </label>
+                </div>
+                <button type="submit" class="btn register-btn">登録する</button>
+                <div class="login-link">
+                    すでにアカウントをお持ちですか？ <a href="/login.html">ログイン</a>
+                </div>
+            </form>
+            
+            <div class="register-separator">
+                <span>または</span>
+            </div>
+            
+            <div class="social-register">
+                <a href="#" class="social-btn">
+                    <img src="/static/images/google-icon.png" alt="Google">
+                </a>
+                <a href="#" class="social-btn">
+                    <img src="/static/images/github-icon.png" alt="GitHub">
+                </a>
+                <a href="#" class="social-btn">
+                    <img src="/static/images/microsoft-icon.png" alt="Microsoft">
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 株式会社イネブラ All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const terms = document.getElementById('terms').checked;
+            
+            // バリデーション
+            if (!firstName || !lastName || !email || !username || !password) {
+                alert('すべての必須項目を入力してください。');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('パスワードが一致しません。');
+                return;
+            }
+            
+            if (!terms) {
+                alert('利用規約とプライバシーポリシーに同意してください。');
+                return;
+            }
+            
+            // ここで登録処理を実装
+            // 実際のアプリケーションではAPIリクエストを送信
+            
+            // 仮の登録処理（デモ用）
+            alert('登録が完了しました！ログインページに移動します。');
+            window.location.href = '/login.html';
+        });
+    </script>
+</body>
+</html>

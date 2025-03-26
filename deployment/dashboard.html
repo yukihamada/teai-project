@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダッシュボード - TeAI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-menu-btn {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .user-name {
+            margin-right: 5px;
+        }
+        
+        .dropdown-icon {
+            font-size: 12px;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 200px;
+            padding: 10px 0;
+            margin-top: 10px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .user-dropdown.active {
+            display: block;
+        }
+        
+        .user-dropdown-item {
+            padding: 10px 20px;
+            display: block;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .user-dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .user-dropdown-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 5px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        main {
+            flex: 1;
+            padding-top: 80px;
+            padding-bottom: 40px;
+        }
+        
+        .dashboard {
+            padding: 40px 0;
+        }
+        
+        .dashboard-header {
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-title {
+            font-size: 32px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .dashboard-subtitle {
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+        
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .dashboard-card-title {
+            font-size: 20px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        .dashboard-card-value {
+            font-size: 36px;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-card-description {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-card-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-active {
+            background-color: var(--secondary-color);
+        }
+        
+        .status-inactive {
+            background-color: var(--accent-color);
+        }
+        
+        .status-text {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .dashboard-table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .dashboard-table-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .dashboard-table-title {
+            font-size: 20px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        .dashboard-table-content {
+            padding: 0 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 15px 10px;
+            color: #7f8c8d;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        footer {
+            background-color: white;
+            padding: 20px 0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-table-content {
+                overflow-x: auto;
+            }
+            
+            .user-name {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/#features">機能</a></li>
+                    <li class="user-menu">
+                        <div class="user-menu-btn" id="user-menu-btn">
+                            <div class="user-avatar" id="user-avatar">U</div>
+                            <span class="user-name" id="user-name">ユーザー</span>
+                            <span class="dropdown-icon">▼</span>
+                        </div>
+                        <div class="user-dropdown" id="user-dropdown">
+                            <a href="#" class="user-dropdown-item">プロフィール</a>
+                            <a href="#" class="user-dropdown-item">設定</a>
+                            <div class="user-dropdown-divider"></div>
+                            <a href="#" class="user-dropdown-item" id="logout-btn">ログアウト</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">ダッシュボード</h2>
+                    <p class="dashboard-subtitle">TeAIの利用状況を確認できます。</p>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon">🚀</div>
+                            <h3 class="dashboard-card-title">TeAI環境</h3>
+                        </div>
+                        <div class="dashboard-card-value" id="instance-count">1</div>
+                        <p class="dashboard-card-description">あなた専用のTeAI環境です。</p>
+                        <div class="dashboard-card-footer">
+                            <div class="dashboard-card-status">
+                                <div class="status-indicator status-active"></div>
+                                <span class="status-text">アクティブ</span>
+                            </div>
+                            <a href="#" class="btn btn-sm" id="access-instance-btn">アクセス</a>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon">📊</div>
+                            <h3 class="dashboard-card-title">利用状況</h3>
+                        </div>
+                        <div class="dashboard-card-value">0</div>
+                        <p class="dashboard-card-description">今月の利用回数です。</p>
+                        <div class="dashboard-card-footer">
+                            <div class="dashboard-card-status">
+                                <div class="status-indicator status-active"></div>
+                                <span class="status-text">無制限</span>
+                            </div>
+                            <a href="#" class="btn btn-sm">詳細</a>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="dashboard-card-icon">💾</div>
+                            <h3 class="dashboard-card-title">ストレージ</h3>
+                        </div>
+                        <div class="dashboard-card-value">0 GB</div>
+                        <p class="dashboard-card-description">使用中のストレージ容量です。</p>
+                        <div class="dashboard-card-footer">
+                            <div class="dashboard-card-status">
+                                <div class="status-indicator status-active"></div>
+                                <span class="status-text">5 GB / 10 GB</span>
+                            </div>
+                            <a href="#" class="btn btn-sm">詳細</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-table">
+                    <div class="dashboard-table-header">
+                        <h3 class="dashboard-table-title">TeAI環境一覧</h3>
+                    </div>
+                    <div class="dashboard-table-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>名前</th>
+                                    <th>URL</th>
+                                    <th>ステータス</th>
+                                    <th>作成日</th>
+                                    <th>アクション</th>
+                                </tr>
+                            </thead>
+                            <tbody id="instances-table-body">
+                                <!-- インスタンス一覧がここに表示されます -->
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">読み込み中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // ユーザーメニューの表示/非表示
+        document.getElementById('user-menu-btn').addEventListener('click', function() {
+            document.getElementById('user-dropdown').classList.toggle('active');
+        });
+        
+        // ドキュメント内のクリックイベントを監視
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu-btn');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            // ユーザーメニュー以外の場所をクリックした場合、ドロップダウンを閉じる
+            if (!userMenu.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+        
+        // ログアウト処理
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // ローカルストレージからトークンを削除
+            localStorage.removeItem('teai_token');
+            localStorage.removeItem('teai_user');
+            
+            // ログインページにリダイレクト
+            window.location.href = '/login.html';
+        });
+        
+        // ページ読み込み時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // ログイン状態の確認
+            const token = localStorage.getItem('teai_token');
+            
+            if (!token) {
+                // トークンがない場合はログインページにリダイレクト
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // ユーザー情報の表示
+            const user = JSON.parse(localStorage.getItem('teai_user'));
+            
+            if (user) {
+                // ユーザーアバターの表示
+                const userAvatar = document.getElementById('user-avatar');
+                userAvatar.textContent = user.username.charAt(0).toUpperCase();
+                
+                // ユーザー名の表示
+                const userName = document.getElementById('user-name');
+                userName.textContent = user.username;
+            }
+            
+            // インスタンス情報の取得
+            fetchInstances();
+        });
+        
+        // インスタンス情報の取得
+        function fetchInstances() {
+            const token = localStorage.getItem('teai_token');
+            
+            fetch('/api/instances', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        // 認証エラーの場合はログインページにリダイレクト
+                        localStorage.removeItem('teai_token');
+                        localStorage.removeItem('teai_user');
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    throw new Error('インスタンス情報の取得に失敗しました。');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // インスタンス数の表示
+                    const instanceCount = document.getElementById('instance-count');
+                    instanceCount.textContent = data.instances.length;
+                    
+                    // インスタンス一覧の表示
+                    const instancesTableBody = document.getElementById('instances-table-body');
+                    instancesTableBody.innerHTML = '';
+                    
+                    if (data.instances.length === 0) {
+                        instancesTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">インスタンスがありません。</td></tr>';
+                        return;
+                    }
+                    
+                    data.instances.forEach(instance => {
+                        const row = document.createElement('tr');
+                        
+                        // 名前
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = instance.subdomain;
+                        row.appendChild(nameCell);
+                        
+                        // URL
+                        const urlCell = document.createElement('td');
+                        const urlLink = document.createElement('a');
+                        urlLink.href = instance.url;
+                        urlLink.textContent = instance.url;
+                        urlLink.target = '_blank';
+                        urlCell.appendChild(urlLink);
+                        row.appendChild(urlCell);
+                        
+                        // ステータス
+                        const statusCell = document.createElement('td');
+                        const statusDiv = document.createElement('div');
+                        statusDiv.className = 'dashboard-card-status';
+                        
+                        const statusIndicator = document.createElement('div');
+                        statusIndicator.className = `status-indicator ${instance.status === 'active' ? 'status-active' : 'status-inactive'}`;
+                        
+                        const statusText = document.createElement('span');
+                        statusText.className = 'status-text';
+                        statusText.textContent = instance.status === 'active' ? 'アクティブ' : '停止中';
+                        
+                        statusDiv.appendChild(statusIndicator);
+                        statusDiv.appendChild(statusText);
+                        statusCell.appendChild(statusDiv);
+                        row.appendChild(statusCell);
+                        
+                        // 作成日
+                        const createdAtCell = document.createElement('td');
+                        const createdAt = new Date(instance.created_at);
+                        createdAtCell.textContent = createdAt.toLocaleDateString('ja-JP');
+                        row.appendChild(createdAtCell);
+                        
+                        // アクション
+                        const actionsCell = document.createElement('td');
+                        const actionsDiv = document.createElement('div');
+                        actionsDiv.className = 'table-actions';
+                        
+                        // アクセスボタン
+                        const accessBtn = document.createElement('a');
+                        accessBtn.href = instance.url;
+                        accessBtn.className = 'btn btn-sm';
+                        accessBtn.textContent = 'アクセス';
+                        accessBtn.target = '_blank';
+                        
+                        // 再起動ボタン
+                        const restartBtn = document.createElement('button');
+                        restartBtn.className = 'btn btn-sm btn-secondary';
+                        restartBtn.textContent = '再起動';
+                        restartBtn.addEventListener('click', function() {
+                            restartInstance(instance.id);
+                        });
+                        
+                        actionsDiv.appendChild(accessBtn);
+                        actionsDiv.appendChild(restartBtn);
+                        actionsCell.appendChild(actionsDiv);
+                        row.appendChild(actionsCell);
+                        
+                        instancesTableBody.appendChild(row);
+                    });
+                    
+                    // アクセスボタンの設定
+                    if (data.instances.length > 0) {
+                        const accessInstanceBtn = document.getElementById('access-instance-btn');
+                        accessInstanceBtn.href = data.instances[0].url;
+                        accessInstanceBtn.target = '_blank';
+                    }
+                } else {
+                    console.error('インスタンス情報の取得に失敗しました。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // インスタンスの再起動
+        function restartInstance(instanceId) {
+            const token = localStorage.getItem('teai_token');
+            
+            fetch('/api/instances/restart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    instanceId: instanceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // インスタンス情報を再取得
+                    fetchInstances();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('インスタンスの再起動に失敗しました。');
+            });
+        }
+    </script>
+</body>
+</html>

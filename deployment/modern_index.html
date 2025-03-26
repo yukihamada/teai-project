@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TeAI - AIによる開発支援プラットフォーム。あなた専用のAIアシスタントで開発効率を劇的に向上させます。">
+    <meta name="keywords" content="AI, 開発支援, プログラミング, コーディング, 人工知能, TeAI">
+    <meta name="author" content="TeAI">
+    <meta property="og:title" content="TeAI - AIによる開発支援プラットフォーム">
+    <meta property="og:description" content="あなた専用のAIアシスタントで開発効率を劇的に向上させます。">
+    <meta property="og:image" content="https://teai.io/static/images/teai-og-image.jpg">
+    <meta property="og:url" content="https://teai.io">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>TeAI - AIによる開発支援プラットフォーム</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+            --container-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            box-shadow: var(--shadow);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 0.75rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            font-weight: 500;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-buttons .btn {
+            margin-left: 1rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 6rem;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e0f2fe 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 60%;
+            height: 70%;
+            background: radial-gradient(circle, var(--primary-light) 0%, rgba(96, 165, 250, 0) 70%);
+            opacity: 0.3;
+            z-index: 0;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 60%;
+            height: 70%;
+            background: radial-gradient(circle, var(--secondary-color) 0%, rgba(16, 185, 129, 0) 70%);
+            opacity: 0.3;
+            z-index: 0;
+            animation: pulse 8s infinite alternate-reverse;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(1.1);
+                opacity: 0.2;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .hero-features {
+            display: flex;
+            gap: 2rem;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .hero-feature {
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-feature-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .hero-feature-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .hero-image {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+            animation: floatAnimation 3s ease-in-out infinite alternate;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background-color: var(--bg-color);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon svg {
+            width: 30px;
+            height: 30px;
+            color: var(--primary-color);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-link {
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .feature-link svg {
+            width: 16px;
+            height: 16px;
+            margin-left: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .feature-link:hover svg {
+            transform: translateX(4px);
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 6rem 0;
+            background-color: var(--bg-light);
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: var(--text-light);
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 6rem 0;
+            background-color: var(--bg-color);
+        }
+
+        .testimonials-slider {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonials-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .testimonial {
+            min-width: 100%;
+            padding: 0 1rem;
+        }
+
+        .testimonial-card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .testimonial-content {
+            font-size: 1.125rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .testimonial-content::before,
+        .testimonial-content::after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--primary-light);
+            position: absolute;
+            opacity: 0.3;
+        }
+
+        .testimonial-content::before {
+            top: -1rem;
+            left: -0.5rem;
+        }
+
+        .testimonial-content::after {
+            bottom: -2rem;
+            right: -0.5rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .testimonial-role {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .testimonial-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .testimonial-dot.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 0;
+            background-color: var(--bg-light);
+        }
+
+        .pricing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-toggle-text {
+            font-weight: 500;
+        }
+
+        .pricing-toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 30px;
+            margin: 0 1rem;
+            cursor: pointer;
+        }
+
+        .pricing-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .pricing-toggle-switch.annual .pricing-toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .pricing-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .pricing-plan {
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-plan.popular {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--primary-color);
+        }
+
+        .pricing-plan.popular::before {
+            content: '人気';
+            position: absolute;
+            top: 1rem;
+            right: -2rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .pricing-price small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-light);
+        }
+
+        .pricing-description {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-feature svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            color: var(--secondary-color);
+        }
+
+        .pricing-feature.disabled {
+            color: var(--text-light);
+            text-decoration: line-through;
+        }
+
+        .pricing-feature.disabled svg {
+            color: var(--text-light);
+        }
+
+        .pricing-button {
+            width: 100%;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn-white {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .btn-white:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--primary-dark);
+        }
+
+        .btn-transparent {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-transparent:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--bg-dark);
+            color: white;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            margin-right: 0.75rem;
+        }
+
+        .footer-logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social-link {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .footer-social-link:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-social-link svg {
+            width: 18px;
+            height: 18px;
+            color: white;
+        }
+
+        .footer-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-link a {
+            color: rgba(255, 255, 255, 0.7);
+            transition: var(--transition);
+        }
+
+        .footer-link a:hover {
+            color: white;
+        }
+
+        .footer-newsletter {
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-newsletter-form {
+            display: flex;
+            margin-top: 1rem;
+        }
+
+        .footer-newsletter-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            outline: none;
+            font-size: 0.875rem;
+        }
+
+        .footer-newsletter-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            padding: 0 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .footer-newsletter-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-link {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .footer-bottom-link:hover {
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-image {
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 0;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                box-shadow: var(--shadow);
+                padding: 1rem 0;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 0.5rem 0;
+            }
+
+            .nav-buttons {
+                display: none;
+            }
+
+            .nav-buttons.active {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                padding: 0 1rem 1rem;
+            }
+
+            .nav-buttons .btn {
+                margin: 0.5rem 0;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-text {
+                margin-bottom: 3rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-features {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .hero-image {
+                max-width: 100%;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .pricing-plan.popular {
+                transform: none;
+            }
+
+            .cta-title {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .hero-features {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .pricing-toggle {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header" id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <span class="logo-text">TeAI</span>
+                </a>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="#features">機能</a></li>
+                    <li><a href="#how-it-works">使い方</a></li>
+                    <li><a href="#pricing">料金</a></li>
+                    <li><a href="#company">会社情報</a></li>
+                    <li><a href="/blog">ブログ</a></li>
+                </ul>
+                <div class="nav-buttons" id="nav-buttons">
+                    <a href="/login.html" class="btn btn-outline">ログイン</a>
+                    <a href="/register.html" class="btn btn-primary">無料で始める</a>
+                </div>
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">AIがあなたの開発を加速する</h1>
+                    <p class="hero-subtitle">TeAIは、あなた専用のAIアシスタントで開発効率を劇的に向上させるプラットフォームです。コーディング、デバッグ、テスト、ドキュメント作成をAIがサポートします。</p>
+                    <div class="hero-buttons">
+                        <a href="/register.html" class="btn btn-primary btn-lg">
+                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            無料で始める
+                        </a>
+                        <a href="#how-it-works" class="btn btn-outline btn-lg">
+                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            デモを見る
+                        </a>
+                    </div>
+                    <div class="hero-features">
+                        <div class="hero-feature">
+                            <svg class="hero-feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="hero-feature-text">クレジットカード不要</span>
+                        </div>
+                        <div class="hero-feature">
+                            <svg class="hero-feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="hero-feature-text">14日間無料トライアル</span>
+                        </div>
+                        <div class="hero-feature">
+                            <svg class="hero-feature-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="hero-feature-text">いつでもキャンセル可能</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="/static/images/teai-dashboard.png" alt="TeAI Dashboard">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">AIがあなたの開発をサポート</h2>
+                <p class="section-subtitle">TeAIは、開発者のための強力なAIアシスタントです。コーディングからデバッグ、テスト、ドキュメント作成まで、あらゆる開発作業をサポートします。</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">コード生成</h3>
+                    <p class="feature-description">自然言語での指示からコードを生成します。複雑なアルゴリズムや関数も簡単に実装できます。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">コードレビュー</h3>
+                    <p class="feature-description">AIがコードをレビューし、バグ、セキュリティの問題、パフォーマンスの改善点を指摘します。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">デバッグ支援</h3>
+                    <p class="feature-description">エラーメッセージを解析し、問題の原因と解決策を提案します。デバッグ時間を大幅に短縮できます。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">テスト生成</h3>
+                    <p class="feature-description">コードからテストケースを自動生成します。単体テスト、統合テスト、エンドツーエンドテストをカバーします。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">ドキュメント作成</h3>
+                    <p class="feature-description">コードからドキュメントを自動生成します。関数の説明、パラメータ、戻り値などを詳細に記述します。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">リファクタリング</h3>
+                    <p class="feature-description">既存のコードを分析し、より効率的で読みやすいコードに自動的にリファクタリングします。</p>
+                    <a href="#" class="feature-link">
+                        詳細を見る
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">TeAIの使い方</h2>
+                <p class="section-subtitle">TeAIは簡単に始められます。アカウント作成から数分で、AIによる開発支援を体験できます。</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">アカウントを作成</h3>
+                        <p class="step-description">メールアドレスを使って無料アカウントを作成します。クレジットカードは必要ありません。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">プロジェクトを接続</h3>
+                        <p class="step-description">GitHubやGitLabのリポジトリを接続するか、コードをアップロードします。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">AIに指示を出す</h3>
+                        <p class="step-description">自然言語でAIに指示を出します。コードの生成、バグの修正、テストの作成など、様々なタスクをリクエストできます。</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">結果を確認・編集</h3>
+                        <p class="step-description">AIが生成した結果を確認し、必要に応じて編集します。変更を保存してプロジェクトに反映させることができます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">ユーザーの声</h2>
+                <p class="section-subtitle">TeAIを使用している開発者からの声をご紹介します。</p>
+            </div>
+            <div class="testimonials-slider">
+                <div class="testimonials-track" id="testimonials-track">
+                    <div class="testimonial">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                TeAIを使い始めてから、コーディング速度が2倍になりました。特にデバッグ時間が大幅に短縮され、生産性が向上しています。AIが提案するコードは高品質で、学習にもなります。
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="testimonial-avatar">
+                                    <img src="/static/images/testimonial-1.jpg" alt="佐藤 健太">
+                                </div>
+                                <div class="testimonial-name">佐藤 健太</div>
+                                <div class="testimonial-role">シニアエンジニア @ Tech株式会社</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                新しい言語やフレームワークを学ぶ際に、TeAIが非常に役立っています。わからないことをAIに質問すると、具体的なコード例とともに丁寧に説明してくれます。プログラミング学習の最高のパートナーです。
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="testimonial-avatar">
+                                    <img src="/static/images/testimonial-2.jpg" alt="田中 美咲">
+                                </div>
+                                <div class="testimonial-name">田中 美咲</div>
+                                <div class="testimonial-role">フロントエンドデベロッパー @ デザインスタジオ</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial">
+                        <div class="testimonial-card">
+                            <div class="testimonial-content">
+                                チームでTeAIを導入したところ、コードレビューの効率が格段に上がりました。AIが事前にコードをチェックしてくれるので、人間のレビュアーはより本質的な部分に集中できます。開発サイクルが短縮され、品質も向上しています。
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="testimonial-avatar">
+                                    <img src="/static/images/testimonial-3.jpg" alt="鈴木 大輔">
+                                </div>
+                                <div class="testimonial-name">鈴木 大輔</div>
+                                <div class="testimonial-role">CTO @ スタートアップ企業</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-dots" id="testimonial-dots">
+                    <div class="testimonial-dot active" data-index="0"></div>
+                    <div class="testimonial-dot" data-index="1"></div>
+                    <div class="testimonial-dot" data-index="2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">シンプルな料金プラン</h2>
+                <p class="section-subtitle">あなたのニーズに合わせた料金プランをご用意しています。いつでもプランの変更が可能です。</p>
+            </div>
+            <div class="pricing-toggle" id="pricing-toggle">
+                <span class="pricing-toggle-text">月額</span>
+                <div class="pricing-toggle-switch" id="pricing-toggle-switch">
+                    <div class="pricing-toggle-slider"></div>
+                </div>
+                <span class="pricing-toggle-text">年額 (20%オフ)</span>
+            </div>
+            <div class="pricing-plans">
+                <div class="pricing-plan">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">スタータープラン</h3>
+                        <div class="pricing-price" id="starter-price">¥2,980<small>/月</small></div>
+                        <p class="pricing-description">個人開発者向けの基本プラン</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            月間100時間の利用
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            3つのプロジェクト
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            基本的なAI機能
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            コミュニティサポート
+                        </li>
+                        <li class="pricing-feature disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            高度なAI機能
+                        </li>
+                        <li class="pricing-feature disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            優先サポート
+                        </li>
+                    </ul>
+                    <a href="/register.html" class="btn btn-primary pricing-button">今すぐ始める</a>
+                </div>
+                <div class="pricing-plan popular">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">プロフェッショナルプラン</h3>
+                        <div class="pricing-price" id="pro-price">¥5,980<small>/月</small></div>
+                        <p class="pricing-description">プロフェッショナル開発者向け</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            無制限の利用時間
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            10のプロジェクト
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            高度なAI機能
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            優先サポート
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            APIアクセス
+                        </li>
+                        <li class="pricing-feature disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            カスタムAIモデル
+                        </li>
+                    </ul>
+                    <a href="/register.html" class="btn btn-primary pricing-button">今すぐ始める</a>
+                </div>
+                <div class="pricing-plan">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">エンタープライズプラン</h3>
+                        <div class="pricing-price" id="enterprise-price">¥14,980<small>/月</small></div>
+                        <p class="pricing-description">チームや企業向け</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            無制限の利用時間
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            無制限のプロジェクト
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            高度なAI機能
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            24時間サポート
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            APIアクセス
+                        </li>
+                        <li class="pricing-feature">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            カスタムAIモデル
+                        </li>
+                    </ul>
+                    <a href="/contact.html" class="btn btn-primary pricing-button">お問い合わせ</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2 class="cta-title">AIの力で開発を加速しませんか？</h2>
+            <p class="cta-subtitle">TeAIを使えば、コーディング、デバッグ、テスト、ドキュメント作成など、あらゆる開発作業がスピードアップします。今すぐ無料トライアルを始めましょう。</p>
+            <div class="cta-buttons">
+                <a href="/register.html" class="btn btn-lg btn-white">無料で始める</a>
+                <a href="/contact.html" class="btn btn-lg btn-transparent">お問い合わせ</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer" id="company">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/" class="footer-logo">
+                        <img src="/static/images/teai-logo-white.png" alt="TeAI Logo">
+                        <span class="footer-logo-text">TeAI</span>
+                    </a>
+                    <p class="footer-description">TeAIは、AIによる開発支援プラットフォームです。コーディング、デバッグ、テスト、ドキュメント作成をAIがサポートします。</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-title">製品</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#features">機能</a></li>
+                        <li class="footer-link"><a href="#pricing">料金</a></li>
+                        <li class="footer-link"><a href="/docs">ドキュメント</a></li>
+                        <li class="footer-link"><a href="/api">API</a></li>
+                        <li class="footer-link"><a href="/integrations">連携</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="footer-title">会社情報</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="/about">会社概要</a></li>
+                        <li class="footer-link"><a href="/blog">ブログ</a></li>
+                        <li class="footer-link"><a href="/careers">採用情報</a></li>
+                        <li class="footer-link"><a href="/contact">お問い合わせ</a></li>
+                        <li class="footer-link"><a href="/partners">パートナー</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="footer-title">サポート</h3>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="/help">ヘルプセンター</a></li>
+                        <li class="footer-link"><a href="/community">コミュニティ</a></li>
+                        <li class="footer-link"><a href="/status">システム状況</a></li>
+                        <li class="footer-link"><a href="/tutorials">チュートリアル</a></li>
+                        <li class="footer-link"><a href="/faq">よくある質問</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="footer-title">ニュースレター</h3>
+                    <p class="footer-description">最新情報やお得な情報をお届けします。</p>
+                    <div class="footer-newsletter">
+                        <form class="footer-newsletter-form">
+                            <input type="email" class="footer-newsletter-input" placeholder="メールアドレス">
+                            <button type="submit" class="footer-newsletter-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-copyright">&copy; 2025 TeAI. All rights reserved.</div>
+                <div class="footer-bottom-links">
+                    <a href="/terms" class="footer-bottom-link">利用規約</a>
+                    <a href="/privacy" class="footer-bottom-link">プライバシーポリシー</a>
+                    <a href="/cookies" class="footer-bottom-link">Cookie ポリシー</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ヘッダースクロール効果
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // モバイルメニュー
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        const navButtons = document.getElementById('nav-buttons');
+
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            navButtons.classList.toggle('active');
+        });
+
+        // テスティモニアルスライダー
+        const testimonialsTrack = document.getElementById('testimonials-track');
+        const testimonialDots = document.querySelectorAll('.testimonial-dot');
+        let currentSlide = 0;
+
+        function goToSlide(index) {
+            testimonialsTrack.style.transform = `translateX(-${index * 100}%)`;
+            testimonialDots.forEach(dot => dot.classList.remove('active'));
+            testimonialDots[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        testimonialDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+        });
+
+        // 自動スライド
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % testimonialDots.length;
+            goToSlide(currentSlide);
+        }, 5000);
+
+        // 料金トグル
+        const pricingToggleSwitch = document.getElementById('pricing-toggle-switch');
+        const starterPrice = document.getElementById('starter-price');
+        const proPrice = document.getElementById('pro-price');
+        const enterprisePrice = document.getElementById('enterprise-price');
+
+        pricingToggleSwitch.addEventListener('click', function() {
+            this.classList.toggle('annual');
+            
+            if (this.classList.contains('annual')) {
+                // 年額料金（20%オフ）
+                starterPrice.innerHTML = '¥28,608<small>/年</small>';
+                proPrice.innerHTML = '¥57,408<small>/年</small>';
+                enterprisePrice.innerHTML = '¥143,808<small>/年</small>';
+            } else {
+                // 月額料金
+                starterPrice.innerHTML = '¥2,980<small>/月</small>';
+                proPrice.innerHTML = '¥5,980<small>/月</small>';
+                enterprisePrice.innerHTML = '¥14,980<small>/月</small>';
+            }
+        });
+
+        // アニメーション
+        const animateElements = document.querySelectorAll('.feature-card, .step, .pricing-plan');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animateElements.forEach(element => {
+            element.style.opacity = 0;
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(element);
+        });
+    </script>
+</body>
+</html>

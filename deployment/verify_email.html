@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メール確認 - TeAI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        main {
+            flex: 1;
+            padding-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .verify-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .verify-logo {
+            margin-bottom: 30px;
+        }
+        
+        .verify-logo img {
+            height: 60px;
+        }
+        
+        .verify-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .verify-message {
+            margin-bottom: 30px;
+            color: #7f8c8d;
+        }
+        
+        .verify-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-bg);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .verify-success {
+            color: var(--secondary-color);
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .verify-error {
+            color: var(--accent-color);
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            background-color: white;
+            padding: 20px 0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .verify-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/#features">機能</a></li>
+                    <li><a href="/#company">会社情報</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="verify-container" id="verify-container">
+            <div class="verify-logo">
+                <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+            </div>
+            <h2 class="verify-title">メールアドレスの確認</h2>
+            <div id="verify-loading">
+                <div class="verify-spinner"></div>
+                <p class="verify-message">メールアドレスを確認しています...</p>
+            </div>
+            <div id="verify-success" style="display: none;">
+                <div class="verify-success">✓</div>
+                <h3>確認完了</h3>
+                <p class="verify-message">メールアドレスの確認が完了しました。TeAIをご利用いただけます。</p>
+                <p class="verify-message">あなた専用のTeAI環境が準備されました：</p>
+                <p><a href="#" id="instance-url" class="btn">TeAI環境にアクセスする</a></p>
+            </div>
+            <div id="verify-error" style="display: none;">
+                <div class="verify-error">✗</div>
+                <h3>確認エラー</h3>
+                <p class="verify-message" id="error-message">メールアドレスの確認に失敗しました。</p>
+                <p><a href="/login.html" class="btn">ログインページに戻る</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // URLからトークンを取得
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (!token) {
+                showError('無効なトークンです。');
+                return;
+            }
+            
+            // APIリクエストを送信
+            fetch(`/api/verify-email?token=${token}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || '確認に失敗しました。');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showSuccess(data.instance_url);
+                    } else {
+                        showError(data.message);
+                    }
+                })
+                .catch(error => {
+                    showError(error.message);
+                });
+        });
+        
+        function showSuccess(instanceUrl) {
+            document.getElementById('verify-loading').style.display = 'none';
+            document.getElementById('verify-success').style.display = 'block';
+            
+            if (instanceUrl) {
+                document.getElementById('instance-url').href = instanceUrl;
+            } else {
+                document.getElementById('instance-url').style.display = 'none';
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('verify-loading').style.display = 'none';
+            document.getElementById('verify-error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+    </script>
+</body>
+</html>

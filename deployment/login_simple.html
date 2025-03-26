@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - TeAI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        main {
+            flex: 1;
+            padding-top: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .login-logo {
+            margin-bottom: 30px;
+        }
+        
+        .login-logo img {
+            height: 60px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-check input {
+            margin-right: 10px;
+        }
+        
+        .form-check label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .login-links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .login-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .login-links a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .login-separator {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .login-separator::before,
+        .login-separator::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .login-separator span {
+            padding: 0 10px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--light-bg);
+            transition: all 0.3s;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .social-btn img {
+            width: 24px;
+            height: 24px;
+        }
+        
+        footer {
+            background-color: white;
+            padding: 20px 0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/">ホーム</a></li>
+                    <li><a href="/#features">機能</a></li>
+                    <li><a href="/#company">会社情報</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <div class="login-logo">
+                <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+            </div>
+            <h2 class="login-title">TeAIにログイン</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">ユーザー名またはメールアドレス</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">ログイン状態を保持する</label>
+                </div>
+                <button type="submit" class="btn login-btn">ログイン</button>
+                <div class="login-links">
+                    <a href="#">パスワードをお忘れですか？</a>
+                    <a href="/register.html">新規登録</a>
+                </div>
+            </form>
+            
+            <div class="login-separator">
+                <span>または</span>
+            </div>
+            
+            <div class="social-login">
+                <a href="#" class="social-btn">
+                    <img src="/static/images/google-icon.png" alt="Google">
+                </a>
+                <a href="#" class="social-btn">
+                    <img src="/static/images/github-icon.png" alt="GitHub">
+                </a>
+                <a href="#" class="social-btn">
+                    <img src="/static/images/microsoft-icon.png" alt="Microsoft">
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2025 All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('ユーザー名/メールアドレスとパスワードを入力してください。');
+                return;
+            }
+            
+            // ログインボタンを無効化
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'ログイン中...';
+            
+            // APIリクエストを送信
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // ログイン成功
+                    // トークンをローカルストレージに保存
+                    localStorage.setItem('teai_token', data.token);
+                    localStorage.setItem('teai_user', JSON.stringify(data.user));
+                    
+                    // インスタンスURLがある場合はそこにリダイレクト
+                    if (data.instance_url) {
+                        window.location.href = data.instance_url;
+                    } else {
+                        window.location.href = '/dashboard.html';
+                    }
+                } else {
+                    // ログイン失敗
+                    if (data.needVerification) {
+                        // メール認証が必要な場合
+                        if (confirm(data.message + '\n確認メールを再送信しますか？')) {
+                            // 確認メールの再送信
+                            fetch('/api/resend-verification', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    userId: data.userId
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('確認メールの再送信に失敗しました。');
+                            });
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                    
+                    // ログインボタンを有効化
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'ログイン';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('ログイン処理中にエラーが発生しました。');
+                
+                // ログインボタンを有効化
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'ログイン';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'TeAI - Simple EC2 Instance'
+
+Parameters:
+  InstanceType:
+    Description: EC2インスタンスタイプ
+    Type: String
+    Default: t3a.large
+    AllowedValues:
+      - t3.medium
+      - t3.large
+      - t3a.large
+      - t3a.xlarge
+      - m5.large
+      - m5.xlarge
+    ConstraintDescription: 有効なEC2インスタンスタイプを指定してください。
+
+  KeyName:
+    Description: EC2インスタンスへのSSHアクセスに使用するキーペア名
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: 既存のEC2キーペア名を指定してください。
+
+  VolumeSize:
+    Description: EBSボリュームのサイズ（GB）
+    Type: Number
+    Default: 30
+    MinValue: 20
+    MaxValue: 100
+    ConstraintDescription: 20から100の間の値を指定してください。
+
+  SSHLocation:
+    Description: SSHアクセスを許可するIPアドレス範囲
+    Type: String
+    Default: 0.0.0.0/0
+    ConstraintDescription: CIDR形式で指定してください（例: 203.0.113.0/24）。
+
+Resources:
+  TeAISecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: TeAI Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+
+  TeAIInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      SecurityGroups:
+        - !Ref TeAISecurityGroup
+      KeyName: !Ref KeyName
+      ImageId: ami-0218d08a1f9dac831  # Amazon Linux 2 in ap-northeast-1
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: !Ref VolumeSize
+            DeleteOnTermination: true
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+          # システムの更新
+          yum update -y
+          amazon-linux-extras install docker nginx python3 -y
+          yum install -y jq sqlite
+
+          # 必要なディレクトリの作成
+          mkdir -p /var/www/teai.io/static/images
+          mkdir -p /var/lib/teai
+          mkdir -p /etc/nginx/conf.d
+
+          # Nginxの設定
+          systemctl enable nginx
+          systemctl start nginx
+
+          # Dockerの設定
+          systemctl enable docker
+          systemctl start docker
+
+          # TeAIイメージのプル（一時的にOpenHandsのイメージを使用）
+          docker pull docker.all-hands.dev/all-hands-ai/runtime:0.30-nikolaik
+          docker pull docker.all-hands.dev/all-hands-ai/openhands:0.30
+
+          # TeAIコンテナの起動
+          docker run -d --rm \
+            -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.30-nikolaik \
+            -e LOG_ALL_EVENTS=true \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /root/.teai-state:/.teai-state \
+            -p 3000:3000 \
+            --add-host host.docker.internal:host-gateway \
+            --name teai-app \
+            docker.all-hands.dev/all-hands-ai/openhands:0.30
+
+          # 起動完了のマーク
+          touch /tmp/teai_setup_complete
+
+      Tags:
+        - Key: Name
+          Value: TeAI-Simple
+
+Outputs:
+  InstanceId:
+    Description: TeAIインスタンスのID
+    Value: !Ref TeAIInstance
+
+  PublicDNS:
+    Description: TeAIインスタンスのパブリックDNS
+    Value: !GetAtt TeAIInstance.PublicDnsName
+
+  PublicIP:
+    Description: TeAIインスタンスのパブリックIP
+    Value: !GetAtt TeAIInstance.PublicIp
+
+  TeAIURL:
+    Description: TeAIへのアクセスURL
+    Value: !Sub http://${TeAIInstance.PublicIpAddress}:3000

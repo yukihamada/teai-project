@@ -1,0 +1,13 @@
+{
+    "FirstName": "TeAI",
+    "LastName": "Admin",
+    "ContactType": "PERSON",
+    "OrganizationName": "TeAI Inc.",
+    "AddressLine1": "123 AI Street",
+    "City": "Tokyo",
+    "State": "JP-13",
+    "CountryCode": "JP",
+    "ZipCode": "100-0001",
+    "PhoneNumber": "+81.123456789",
+    "Email": "admin@teai.io"
+}

@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - TeAI</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-color: #2c3e50;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --border-color: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-bg);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .user-name {
+            font-weight: 500;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover td {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .status-inactive {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .form-check input {
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-header h1,
+            .sidebar-menu h2,
+            .sidebar-menu a span {
+                display: none;
+            }
+            
+            .sidebar-menu a i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+            <h1>TeAI 管理者</h1>
+        </div>
+        <div class="sidebar-menu">
+            <h2>メインメニュー</h2>
+            <ul>
+                <li><a href="#dashboard" class="active" onclick="showTab('dashboard')"><i>📊</i> <span>ダッシュボード</span></a></li>
+                <li><a href="#users" onclick="showTab('users')"><i>👥</i> <span>ユーザー管理</span></a></li>
+                <li><a href="#instances" onclick="showTab('instances')"><i>🖥️</i> <span>インスタンス管理</span></a></li>
+                <li><a href="#settings" onclick="showTab('settings')"><i>⚙️</i> <span>設定</span></a></li>
+            </ul>
+            <h2>アカウント</h2>
+            <ul>
+                <li><a href="/dashboard.html"><i>🏠</i> <span>マイダッシュボード</span></a></li>
+                <li><a href="#" id="logout-btn"><i>🚪</i> <span>ログアウト</span></a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>管理者ダッシュボード</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">A</div>
+                <span class="user-name" id="user-name">管理者</span>
+            </div>
+        </div>
+        
+        <!-- ダッシュボードタブ -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>総ユーザー数</h3>
+                    <div class="value" id="total-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>アクティブインスタンス</h3>
+                    <div class="value" id="active-instances">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今日の新規ユーザー</h3>
+                    <div class="value" id="new-users-today">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>今月の新規ユーザー</h3>
+                    <div class="value" id="new-users-month">0</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>最近のユーザー</h2>
+                    <a href="#users" class="btn btn-sm" onclick="showTab('users')">すべて表示</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ユーザー名</th>
+                                <th>メールアドレス</th>
+                                <th>登録日</th>
+                                <th>ステータス</th>
+                                <th>アクション</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-users-table">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">読み込み中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>最近のインスタンス</h2>
+                    <a href="#instances" class="btn btn-sm" onclick="showTab('instances')">すべて表示</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>サブドメイン</th>
+                                <th>ユーザー</th>
+                                <th>作成日</th>
+                                <th>ステータス</th>
+                                <th>アクション</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-instances-table">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">読み込み中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ユーザー管理タブ -->
+        <div id="users-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>ユーザー管理</h2>
+                    <button class="btn btn-sm" onclick="showAddUserModal()">ユーザーを追加</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ユーザー名</th>
+                                <th>メールアドレス</th>
+                                <th>名前</th>
+                                <th>登録日</th>
+                                <th>最終ログイン</th>
+                                <th>ステータス</th>
+                                <th>アクション</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">読み込み中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- インスタンス管理タブ -->
+        <div id="instances-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>インスタンス管理</h2>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>サブドメイン</th>
+                                <th>ユーザー</th>
+                                <th>ポート</th>
+                                <th>作成日</th>
+                                <th>最終アクティブ</th>
+                                <th>ステータス</th>
+                                <th>アクション</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instances-table">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">読み込み中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 設定タブ -->
+        <div id="settings-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>システム設定</h2>
+                </div>
+                <div class="card-body">
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label for="site-name">サイト名</label>
+                            <input type="text" id="site-name" class="form-control" value="TeAI">
+                        </div>
+                        <div class="form-group">
+                            <label for="site-url">サイトURL</label>
+                            <input type="text" id="site-url" class="form-control" value="https://teai.io">
+                        </div>
+                        <div class="form-group">
+                            <label for="admin-email">管理者メールアドレス</label>
+                            <input type="email" id="admin-email" class="form-control" value="admin@teai.io">
+                        </div>
+                        <div class="form-group">
+                            <label>機能の有効化</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="enable-registration" checked>
+                                <label for="enable-registration">ユーザー登録を許可</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="enable-email-verification" checked>
+                                <label for="enable-email-verification">メール認証を要求</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="enable-auto-instance" checked>
+                                <label for="enable-auto-instance">自動インスタンス作成</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">設定を保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ユーザー追加モーダル -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ユーザーを追加</h2>
+                <span class="modal-close" onclick="hideAddUserModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="add-username">ユーザー名</label>
+                        <input type="text" id="add-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-email">メールアドレス</label>
+                        <input type="email" id="add-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-password">パスワード</label>
+                        <input type="password" id="add-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-first-name">名</label>
+                        <input type="text" id="add-first-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-last-name">姓</label>
+                        <input type="text" id="add-last-name" class="form-control">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="add-is-verified">
+                        <label for="add-is-verified">メール認証済み</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="add-is-admin">
+                        <label for="add-is-admin">管理者権限</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideAddUserModal()">キャンセル</button>
+                <button class="btn" onclick="addUser()">追加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ユーザー編集モーダル -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ユーザーを編集</h2>
+                <span class="modal-close" onclick="hideEditUserModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-user-form">
+                    <input type="hidden" id="edit-user-id">
+                    <div class="form-group">
+                        <label for="edit-username">ユーザー名</label>
+                        <input type="text" id="edit-username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">メールアドレス</label>
+                        <input type="email" id="edit-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-password">パスワード（変更する場合のみ）</label>
+                        <input type="password" id="edit-password" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-first-name">名</label>
+                        <input type="text" id="edit-first-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-last-name">姓</label>
+                        <input type="text" id="edit-last-name" class="form-control">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="edit-is-verified">
+                        <label for="edit-is-verified">メール認証済み</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="edit-is-admin">
+                        <label for="edit-is-admin">管理者権限</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideEditUserModal()">キャンセル</button>
+                <button class="btn" onclick="updateUser()">更新</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 削除確認モーダル -->
+    <div id="confirm-delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>削除の確認</h2>
+                <span class="modal-close" onclick="hideConfirmDeleteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-delete-message">このユーザーを削除してもよろしいですか？この操作は元に戻せません。</p>
+                <input type="hidden" id="delete-item-id">
+                <input type="hidden" id="delete-item-type">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideConfirmDeleteModal()">キャンセル</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">削除</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // グローバル変数
+        let currentUser = null;
+        let allUsers = [];
+        let allInstances = [];
+        
+        // ページ読み込み時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // 認証チェック
+            checkAuth();
+            
+            // ログアウトボタンのイベントリスナー
+            document.getElementById('logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // 設定フォームのイベントリスナー
+            document.getElementById('settings-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveSettings();
+            });
+        });
+        
+        // 認証チェック
+        function checkAuth() {
+            const token = localStorage.getItem('teai_token');
+            
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            fetch('/api/auth/check', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.authenticated) {
+                    currentUser = data.user;
+                    
+                    // 管理者権限の確認
+                    if (!currentUser.isAdmin) {
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                    
+                    // ユーザー情報の表示
+                    document.getElementById('user-avatar').textContent = currentUser.username.charAt(0).toUpperCase();
+                    document.getElementById('user-name').textContent = currentUser.username;
+                    
+                    // データの読み込み
+                    loadDashboardData();
+                } else {
+                    window.location.href = '/login.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/login.html';
+            });
+        }
+        
+        // ログアウト処理
+        function logout() {
+            localStorage.removeItem('teai_token');
+            localStorage.removeItem('teai_user');
+            window.location.href = '/login.html';
+        }
+        
+        // タブの切り替え
+        function showTab(tabId) {
+            // すべてのタブコンテンツを非表示
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // すべてのタブリンクからアクティブクラスを削除
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // 選択したタブを表示
+            document.getElementById(`${tabId}-tab`).style.display = 'block';
+            
+            // 選択したタブリンクをアクティブに
+            document.querySelector(`.sidebar-menu a[href="#${tabId}"]`).classList.add('active');
+            
+            // タブに応じたデータの読み込み
+            if (tabId === 'dashboard') {
+                loadDashboardData();
+            } else if (tabId === 'users') {
+                loadUsers();
+            } else if (tabId === 'instances') {
+                loadInstances();
+            }
+        }
+        
+        // ダッシュボードデータの読み込み
+        function loadDashboardData() {
+            loadUsers(true);
+            loadInstances(true);
+        }
+        
+        // ユーザー一覧の読み込み
+        function loadUsers(isDashboard = false) {
+            const token = localStorage.getItem('teai_token');
+            
+            fetch('/api/admin/users', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    allUsers = data.users;
+                    
+                    // 統計情報の更新
+                    document.getElementById('total-users').textContent = allUsers.length;
+                    
+                    // 今日の新規ユーザー数
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const newUsersToday = allUsers.filter(user => {
+                        const createdAt = new Date(user.createdAt);
+                        return createdAt >= today;
+                    }).length;
+                    document.getElementById('new-users-today').textContent = newUsersToday;
+                    
+                    // 今月の新規ユーザー数
+                    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    const newUsersMonth = allUsers.filter(user => {
+                        const createdAt = new Date(user.createdAt);
+                        return createdAt >= firstDayOfMonth;
+                    }).length;
+                    document.getElementById('new-users-month').textContent = newUsersMonth;
+                    
+                    if (isDashboard) {
+                        // 最近のユーザーのみ表示（最大5件）
+                        const recentUsers = [...allUsers].sort((a, b) => {
+                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        }).slice(0, 5);
+                        
+                        renderUsersTable(recentUsers, 'recent-users-table', true);
+                    } else {
+                        // すべてのユーザーを表示
+                        renderUsersTable(allUsers, 'users-table');
+                    }
+                } else {
+                    console.error('Failed to load users:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // インスタンス一覧の読み込み
+        function loadInstances(isDashboard = false) {
+            const token = localStorage.getItem('teai_token');
+            
+            fetch('/api/admin/instances', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    allInstances = data.instances;
+                    
+                    // アクティブなインスタンス数
+                    const activeInstances = allInstances.filter(instance => instance.status === 'active').length;
+                    document.getElementById('active-instances').textContent = activeInstances;
+                    
+                    if (isDashboard) {
+                        // 最近のインスタンスのみ表示（最大5件）
+                        const recentInstances = [...allInstances].sort((a, b) => {
+                            return new Date(b.createdAt) - new Date(a.createdAt);
+                        }).slice(0, 5);
+                        
+                        renderInstancesTable(recentInstances, 'recent-instances-table', true);
+                    } else {
+                        // すべてのインスタンスを表示
+                        renderInstancesTable(allInstances, 'instances-table');
+                    }
+                } else {
+                    console.error('Failed to load instances:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // ユーザーテーブルのレンダリング
+        function renderUsersTable(users, tableId, isSimple = false) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            if (users.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = isSimple ? 5 : 7;
+                cell.style.textAlign = 'center';
+                cell.textContent = 'ユーザーがいません';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                // ユーザー名
+                const usernameCell = document.createElement('td');
+                usernameCell.textContent = user.username;
+                row.appendChild(usernameCell);
+                
+                // メールアドレス
+                const emailCell = document.createElement('td');
+                emailCell.textContent = user.email;
+                row.appendChild(emailCell);
+                
+                if (!isSimple) {
+                    // 名前
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = `${user.firstName || ''} ${user.lastName || ''}`.trim() || '-';
+                    row.appendChild(nameCell);
+                }
+                
+                // 登録日
+                const createdAtCell = document.createElement('td');
+                createdAtCell.textContent = new Date(user.createdAt).toLocaleDateString('ja-JP');
+                row.appendChild(createdAtCell);
+                
+                if (!isSimple) {
+                    // 最終ログイン
+                    const lastLoginCell = document.createElement('td');
+                    lastLoginCell.textContent = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('ja-JP') : '-';
+                    row.appendChild(lastLoginCell);
+                }
+                
+                // ステータス
+                const statusCell = document.createElement('td');
+                const statusSpan = document.createElement('span');
+                statusSpan.className = `status ${user.isVerified ? 'status-active' : 'status-pending'}`;
+                statusSpan.textContent = user.isVerified ? '認証済み' : '未認証';
+                statusCell.appendChild(statusSpan);
+                row.appendChild(statusCell);
+                
+                // アクション
+                const actionsCell = document.createElement('td');
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'table-actions';
+                
+                // 編集ボタン
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn btn-sm btn-secondary';
+                editBtn.textContent = '編集';
+                editBtn.addEventListener('click', () => showEditUserModal(user));
+                actionsDiv.appendChild(editBtn);
+                
+                // 削除ボタン
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-danger';
+                deleteBtn.textContent = '削除';
+                deleteBtn.addEventListener('click', () => showConfirmDeleteModal(user.id, 'user', `ユーザー「${user.username}」を削除してもよろしいですか？この操作は元に戻せません。`));
+                actionsDiv.appendChild(deleteBtn);
+                
+                actionsCell.appendChild(actionsDiv);
+                row.appendChild(actionsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // インスタンステーブルのレンダリング
+        function renderInstancesTable(instances, tableId, isSimple = false) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+            
+            if (instances.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = isSimple ? 5 : 7;
+                cell.style.textAlign = 'center';
+                cell.textContent = 'インスタンスがありません';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            instances.forEach(instance => {
+                const row = document.createElement('tr');
+                
+                // サブドメイン
+                const subdomainCell = document.createElement('td');
+                const subdomainLink = document.createElement('a');
+                subdomainLink.href = instance.url;
+                subdomainLink.textContent = instance.subdomain;
+                subdomainLink.target = '_blank';
+                subdomainCell.appendChild(subdomainLink);
+                row.appendChild(subdomainCell);
+                
+                // ユーザー
+                const userCell = document.createElement('td');
+                userCell.textContent = instance.user.username;
+                row.appendChild(userCell);
+                
+                if (!isSimple) {
+                    // ポート
+                    const portCell = document.createElement('td');
+                    portCell.textContent = instance.port;
+                    row.appendChild(portCell);
+                }
+                
+                // 作成日
+                const createdAtCell = document.createElement('td');
+                createdAtCell.textContent = new Date(instance.createdAt).toLocaleDateString('ja-JP');
+                row.appendChild(createdAtCell);
+                
+                if (!isSimple) {
+                    // 最終アクティブ
+                    const lastActiveCell = document.createElement('td');
+                    lastActiveCell.textContent = instance.lastActive ? new Date(instance.lastActive).toLocaleDateString('ja-JP') : '-';
+                    row.appendChild(lastActiveCell);
+                }
+                
+                // ステータス
+                const statusCell = document.createElement('td');
+                const statusSpan = document.createElement('span');
+                statusSpan.className = `status ${instance.status === 'active' ? 'status-active' : 'status-inactive'}`;
+                statusSpan.textContent = instance.status === 'active' ? 'アクティブ' : '停止中';
+                statusCell.appendChild(statusSpan);
+                row.appendChild(statusCell);
+                
+                // アクション
+                const actionsCell = document.createElement('td');
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'table-actions';
+                
+                // 再起動ボタン
+                const restartBtn = document.createElement('button');
+                restartBtn.className = 'btn btn-sm btn-warning';
+                restartBtn.textContent = '再起動';
+                restartBtn.addEventListener('click', () => restartInstance(instance.id));
+                actionsDiv.appendChild(restartBtn);
+                
+                actionsCell.appendChild(actionsDiv);
+                row.appendChild(actionsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // インスタンスの再起動
+        function restartInstance(instanceId) {
+            const token = localStorage.getItem('teai_token');
+            
+            fetch('/api/instances/restart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    instanceId: instanceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    loadInstances();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('インスタンスの再起動に失敗しました。');
+            });
+        }
+        
+        // ユーザー追加モーダルの表示
+        function showAddUserModal() {
+            document.getElementById('add-user-form').reset();
+            document.getElementById('add-user-modal').style.display = 'flex';
+        }
+        
+        // ユーザー追加モーダルの非表示
+        function hideAddUserModal() {
+            document.getElementById('add-user-modal').style.display = 'none';
+        }
+        
+        // ユーザー編集モーダルの表示
+        function showEditUserModal(user) {
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-username').value = user.username;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-password').value = '';
+            document.getElementById('edit-first-name').value = user.firstName || '';
+            document.getElementById('edit-last-name').value = user.lastName || '';
+            document.getElementById('edit-is-verified').checked = user.isVerified;
+            document.getElementById('edit-is-admin').checked = user.isAdmin;
+            
+            document.getElementById('edit-user-modal').style.display = 'flex';
+        }
+        
+        // ユーザー編集モーダルの非表示
+        function hideEditUserModal() {
+            document.getElementById('edit-user-modal').style.display = 'none';
+        }
+        
+        // 削除確認モーダルの表示
+        function showConfirmDeleteModal(itemId, itemType, message) {
+            document.getElementById('delete-item-id').value = itemId;
+            document.getElementById('delete-item-type').value = itemType;
+            document.getElementById('confirm-delete-message').textContent = message;
+            document.getElementById('confirm-delete-modal').style.display = 'flex';
+        }
+        
+        // 削除確認モーダルの非表示
+        function hideConfirmDeleteModal() {
+            document.getElementById('confirm-delete-modal').style.display = 'none';
+        }
+        
+        // ユーザーの追加
+        function addUser() {
+            const token = localStorage.getItem('teai_token');
+            
+            const username = document.getElementById('add-username').value;
+            const email = document.getElementById('add-email').value;
+            const password = document.getElementById('add-password').value;
+            const firstName = document.getElementById('add-first-name').value;
+            const lastName = document.getElementById('add-last-name').value;
+            const isVerified = document.getElementById('add-is-verified').checked;
+            const isAdmin = document.getElementById('add-is-admin').checked;
+            
+            if (!username || !email || !password) {
+                alert('ユーザー名、メールアドレス、パスワードは必須です。');
+                return;
+            }
+            
+            // APIリクエストを送信
+            fetch('/api/admin/users', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password,
+                    firstName: firstName,
+                    lastName: lastName,
+                    isVerified: isVerified,
+                    isAdmin: isAdmin
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    hideAddUserModal();
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('ユーザーの追加に失敗しました。');
+            });
+        }
+        
+        // ユーザーの更新
+        function updateUser() {
+            const token = localStorage.getItem('teai_token');
+            
+            const userId = document.getElementById('edit-user-id').value;
+            const username = document.getElementById('edit-username').value;
+            const email = document.getElementById('edit-email').value;
+            const password = document.getElementById('edit-password').value;
+            const firstName = document.getElementById('edit-first-name').value;
+            const lastName = document.getElementById('edit-last-name').value;
+            const isVerified = document.getElementById('edit-is-verified').checked;
+            const isAdmin = document.getElementById('edit-is-admin').checked;
+            
+            if (!username || !email) {
+                alert('ユーザー名とメールアドレスは必須です。');
+                return;
+            }
+            
+            // 更新データの準備
+            const updateData = {
+                username: username,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                isVerified: isVerified,
+                isAdmin: isAdmin
+            };
+            
+            // パスワードが入力されている場合のみ追加
+            if (password) {
+                updateData.password = password;
+            }
+            
+            // APIリクエストを送信
+            fetch(`/api/admin/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    hideEditUserModal();
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('ユーザー情報の更新に失敗しました。');
+            });
+        }
+        
+        // 削除の確認
+        function confirmDelete() {
+            const token = localStorage.getItem('teai_token');
+            
+            const itemId = document.getElementById('delete-item-id').value;
+            const itemType = document.getElementById('delete-item-type').value;
+            
+            if (itemType === 'user') {
+                // ユーザーの削除
+                fetch(`/api/admin/users/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        hideConfirmDeleteModal();
+                        loadUsers();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('ユーザーの削除に失敗しました。');
+                });
+            }
+        }
+        
+        // 設定の保存
+        function saveSettings() {
+            alert('設定が保存されました。');
+        }
+    </script>
+</body>
+</html>
