@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'TeAI - AIによる開発支援プラットフォーム'
+Description: 'TeAI - AIによる開発支援プラットフォーム（サブドメイン対応）'
 
 Parameters:
   InstanceType:
@@ -35,6 +35,17 @@ Parameters:
     AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
     ConstraintDescription: CIDR形式で指定してください（例: 203.0.113.0/24）。
 
+  DomainName:
+    Description: TeAIのドメイン名
+    Type: String
+    Default: teai.io
+    ConstraintDescription: 有効なドメイン名を指定してください。
+
+  HostedZoneId:
+    Description: Route 53のホストゾーンID
+    Type: String
+    ConstraintDescription: 有効なホストゾーンIDを指定してください。
+
 Resources:
   TeAISecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -57,8 +68,16 @@ Resources:
           FromPort: 3000
           ToPort: 3000
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
 
-  TeAIInstance:
+  TeAIMainInstance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: !Ref InstanceType
@@ -79,31 +98,1031 @@ Resources:
 
           # システムの更新
           yum update -y
-          amazon-linux-extras install docker -y
+          amazon-linux-extras install docker nginx python3 -y
+          yum install -y certbot python3-certbot-nginx jq sqlite
+
+          # 必要なディレクトリの作成
+          mkdir -p /var/www/teai.io/static/images
+          mkdir -p /var/lib/teai
+          mkdir -p /etc/nginx/conf.d
+
+          # Nginxの設定
+          systemctl enable nginx
+          systemctl start nginx
+
+          # Dockerの設定
           systemctl enable docker
           systemctl start docker
 
-          # TeAIイメージのプル
-          docker pull teai/app:latest
-          docker pull teai/runtime:latest
+          # TeAIイメージのプル（一時的にOpenHandsのイメージを使用）
+          docker pull docker.all-hands.dev/all-hands-ai/runtime:0.30-nikolaik
+          docker pull docker.all-hands.dev/all-hands-ai/openhands:0.30
 
-          # TeAIコンテナの起動
+          # APIサーバーの依存関係をインストール
+          pip3 install flask flask-cors
+
+          # APIサーバーの設定ファイルをダウンロード
+          cat > /usr/local/bin/teai_api_server.py << 'EOF'
+          #!/usr/bin/env python3
+          import json
+          import logging
+          import os
+          import hashlib
+          import time
+          import subprocess
+          from flask import Flask, request, jsonify, g
+          from flask_cors import CORS
+          import sqlite3
+          import uuid
+          from datetime import datetime, timedelta
+
+          # ログ設定
+          logging.basicConfig(
+              level=logging.INFO,
+              format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
+              handlers=[
+                  logging.FileHandler("/var/log/teai-api-server.log"),
+                  logging.StreamHandler()
+              ]
+          )
+          logger = logging.getLogger("teai-api-server")
+
+          app = Flask(__name__)
+          CORS(app)
+
+          # データベース設定
+          DATABASE_PATH = '/var/lib/teai/teai.db'
+          NGINX_CONFIG_PATH = '/etc/nginx/conf.d/teai_instances.conf'
+          NGINX_MAP_TEMPLATE = """
+          # TeAI インスタンスマッピング - 自動生成されたファイルです
+          # 最終更新: {timestamp}
+
+          map $instance_id $backend_server {{
+              default "127.0.0.1:3000";  # デフォルトサーバー
+          {instance_mappings}
+          }}
+          """
+
+          def get_db():
+              """データベース接続を取得"""
+              db = getattr(g, '_database', None)
+              if db is None:
+                  os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+                  db = g._database = sqlite3.connect(DATABASE_PATH)
+                  db.row_factory = sqlite3.Row
+              return db
+
+          @app.teardown_appcontext
+          def close_connection(exception):
+              """アプリケーションコンテキスト終了時にDB接続を閉じる"""
+              db = getattr(g, '_database', None)
+              if db is not None:
+                  db.close()
+
+          def init_db():
+              """データベースの初期化"""
+              with app.app_context():
+                  db = get_db()
+                  cursor = db.cursor()
+                  
+                  # ユーザーテーブル
+                  cursor.execute('''
+                  CREATE TABLE IF NOT EXISTS users (
+                      id TEXT PRIMARY KEY,
+                      username TEXT UNIQUE NOT NULL,
+                      email TEXT UNIQUE NOT NULL,
+                      password_hash TEXT NOT NULL,
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                      last_login TIMESTAMP
+                  )
+                  ''')
+                  
+                  # インスタンステーブル
+                  cursor.execute('''
+                  CREATE TABLE IF NOT EXISTS instances (
+                      id TEXT PRIMARY KEY,
+                      user_id TEXT NOT NULL,
+                      subdomain TEXT UNIQUE NOT NULL,
+                      ip_address TEXT NOT NULL,
+                      port INTEGER NOT NULL,
+                      status TEXT NOT NULL,
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                      last_active TIMESTAMP,
+                      FOREIGN KEY (user_id) REFERENCES users (id)
+                  )
+                  ''')
+                  
+                  # セッションテーブル
+                  cursor.execute('''
+                  CREATE TABLE IF NOT EXISTS sessions (
+                      id TEXT PRIMARY KEY,
+                      user_id TEXT NOT NULL,
+                      token TEXT UNIQUE NOT NULL,
+                      expires_at TIMESTAMP NOT NULL,
+                      FOREIGN KEY (user_id) REFERENCES users (id)
+                  )
+                  ''')
+                  
+                  db.commit()
+
+          def update_nginx_config():
+              """Nginxの設定ファイルを更新"""
+              with app.app_context():
+                  db = get_db()
+                  cursor = db.cursor()
+                  cursor.execute('SELECT subdomain, ip_address, port FROM instances WHERE status = "active"')
+                  instances = cursor.fetchall()
+                  
+                  mappings = []
+                  for instance in instances:
+                      mappings.append(f'    {instance["subdomain"]} "{instance["ip_address"]}:{instance["port"]}";')
+                  
+                  instance_mappings = "\n".join(mappings)
+                  config_content = NGINX_MAP_TEMPLATE.format(
+                      timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                      instance_mappings=instance_mappings
+                  )
+                  
+                  with open(NGINX_CONFIG_PATH, 'w') as f:
+                      f.write(config_content)
+                  
+                  # Nginxの設定をリロード
+                  try:
+                      subprocess.run(['nginx', '-s', 'reload'], check=True)
+                      logger.info("Nginx configuration reloaded successfully")
+                  except subprocess.CalledProcessError as e:
+                      logger.error(f"Failed to reload Nginx: {e}")
+
+          @app.route('/api/register', methods=['POST'])
+          def register():
+              """新規ユーザー登録"""
+              data = request.get_json()
+              username = data.get('username')
+              email = data.get('email')
+              password = data.get('password')
+              
+              if not all([username, email, password]):
+                  return jsonify({"success": False, "message": "Missing required fields"}), 400
+              
+              # パスワードハッシュ化
+              password_hash = hashlib.sha256(password.encode()).hexdigest()
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              try:
+                  user_id = str(uuid.uuid4())
+                  cursor.execute(
+                      'INSERT INTO users (id, username, email, password_hash) VALUES (?, ?, ?, ?)',
+                      (user_id, username, email, password_hash)
+                  )
+                  db.commit()
+                  return jsonify({"success": True, "message": "User registered successfully"}), 201
+              except sqlite3.IntegrityError:
+                  return jsonify({"success": False, "message": "Username or email already exists"}), 409
+              except Exception as e:
+                  logger.error(f"Registration error: {e}")
+                  return jsonify({"success": False, "message": "Registration failed"}), 500
+
+          @app.route('/api/login', methods=['POST'])
+          def login():
+              """ユーザーログイン"""
+              data = request.get_json()
+              username = data.get('username')
+              password = data.get('password')
+              
+              if not all([username, password]):
+                  return jsonify({"success": False, "message": "Missing username or password"}), 400
+              
+              # パスワードハッシュ化
+              password_hash = hashlib.sha256(password.encode()).hexdigest()
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              cursor.execute(
+                  'SELECT id, username, email FROM users WHERE username = ? AND password_hash = ?',
+                  (username, password_hash)
+              )
+              user = cursor.fetchone()
+              
+              if user:
+                  # セッショントークン生成
+                  token = str(uuid.uuid4())
+                  expires_at = datetime.now() + timedelta(days=7)
+                  
+                  # 既存のセッションを削除
+                  cursor.execute('DELETE FROM sessions WHERE user_id = ?', (user['id'],))
+                  
+                  # 新しいセッションを作成
+                  session_id = str(uuid.uuid4())
+                  cursor.execute(
+                      'INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)',
+                      (session_id, user['id'], token, expires_at)
+                  )
+                  
+                  # 最終ログイン時間を更新
+                  cursor.execute(
+                      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?',
+                      (user['id'],)
+                  )
+                  
+                  db.commit()
+                  
+                  return jsonify({
+                      "success": True,
+                      "message": "Login successful",
+                      "user": {
+                          "id": user['id'],
+                          "username": user['username'],
+                          "email": user['email']
+                      },
+                      "token": token,
+                      "expires_at": expires_at.isoformat()
+                  }), 200
+              else:
+                  return jsonify({"success": False, "message": "Invalid username or password"}), 401
+
+          @app.route('/auth', methods=['GET'])
+          def auth():
+              """認証チェック"""
+              token = request.headers.get('Authorization', '').replace('Bearer ', '')
+              
+              if not token:
+                  return jsonify({"authenticated": False, "message": "No token provided"}), 401
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              cursor.execute(
+                  '''
+                  SELECT s.user_id, u.username, u.email
+                  FROM sessions s
+                  JOIN users u ON s.user_id = u.id
+                  WHERE s.token = ? AND s.expires_at > CURRENT_TIMESTAMP
+                  ''',
+                  (token,)
+              )
+              session = cursor.fetchone()
+              
+              if session:
+                  return jsonify({
+                      "authenticated": True,
+                      "user": {
+                          "id": session['user_id'],
+                          "username": session['username'],
+                          "email": session['email']
+                      }
+                  }), 200
+              else:
+                  return jsonify({"authenticated": False, "message": "Invalid or expired token"}), 401
+
+          @app.route('/api/instances', methods=['GET'])
+          def get_instances():
+              """ユーザーのインスタンス一覧を取得"""
+              token = request.headers.get('Authorization', '').replace('Bearer ', '')
+              
+              if not token:
+                  return jsonify({"success": False, "message": "No token provided"}), 401
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              # トークンからユーザーIDを取得
+              cursor.execute(
+                  'SELECT user_id FROM sessions WHERE token = ? AND expires_at > CURRENT_TIMESTAMP',
+                  (token,)
+              )
+              session = cursor.fetchone()
+              
+              if not session:
+                  return jsonify({"success": False, "message": "Invalid or expired token"}), 401
+              
+              user_id = session['user_id']
+              
+              # ユーザーのインスタンス一覧を取得
+              cursor.execute(
+                  '''
+                  SELECT id, subdomain, ip_address, port, status, created_at, last_active
+                  FROM instances
+                  WHERE user_id = ?
+                  ORDER BY created_at DESC
+                  ''',
+                  (user_id,)
+              )
+              instances = cursor.fetchall()
+              
+              result = []
+              for instance in instances:
+                  result.append({
+                      "id": instance['id'],
+                      "subdomain": instance['subdomain'],
+                      "url": f"https://{instance['subdomain']}.teai.io",
+                      "status": instance['status'],
+                      "created_at": instance['created_at'],
+                      "last_active": instance['last_active']
+                  })
+              
+              return jsonify({"success": True, "instances": result}), 200
+
+          @app.route('/api/instances', methods=['POST'])
+          def create_instance():
+              """新しいインスタンスを作成"""
+              token = request.headers.get('Authorization', '').replace('Bearer ', '')
+              
+              if not token:
+                  return jsonify({"success": False, "message": "No token provided"}), 401
+              
+              data = request.get_json()
+              subdomain = data.get('subdomain')
+              
+              if not subdomain:
+                  return jsonify({"success": False, "message": "Subdomain is required"}), 400
+              
+              # サブドメインのバリデーション
+              if not subdomain.isalnum() or len(subdomain) < 3 or len(subdomain) > 20:
+                  return jsonify({
+                      "success": False,
+                      "message": "Subdomain must be alphanumeric and between 3-20 characters"
+                  }), 400
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              # トークンからユーザーIDを取得
+              cursor.execute(
+                  'SELECT user_id FROM sessions WHERE token = ? AND expires_at > CURRENT_TIMESTAMP',
+                  (token,)
+              )
+              session = cursor.fetchone()
+              
+              if not session:
+                  return jsonify({"success": False, "message": "Invalid or expired token"}), 401
+              
+              user_id = session['user_id']
+              
+              # サブドメインの重複チェック
+              cursor.execute('SELECT id FROM instances WHERE subdomain = ?', (subdomain,))
+              if cursor.fetchone():
+                  return jsonify({"success": False, "message": "Subdomain already exists"}), 409
+              
+              # 新しいインスタンスを作成
+              instance_id = str(uuid.uuid4())
+              ip_address = "127.0.0.1"  # 実際の環境では動的に割り当てる
+              port = 3000  # 実際の環境では動的に割り当てる
+              
+              try:
+                  cursor.execute(
+                      '''
+                      INSERT INTO instances (id, user_id, subdomain, ip_address, port, status)
+                      VALUES (?, ?, ?, ?, ?, ?)
+                      ''',
+                      (instance_id, user_id, subdomain, ip_address, port, "provisioning")
+                  )
+                  db.commit()
+                  
+                  # ここで実際のインスタンスをプロビジョニングするコードを追加
+                  # 例: AWS EC2インスタンスの起動など
+                  
+                  # プロビジョニングが完了したら、ステータスを更新
+                  cursor.execute(
+                      'UPDATE instances SET status = ? WHERE id = ?',
+                      ("active", instance_id)
+                  )
+                  db.commit()
+                  
+                  # Nginx設定を更新
+                  update_nginx_config()
+                  
+                  return jsonify({
+                      "success": True,
+                      "message": "Instance created successfully",
+                      "instance": {
+                          "id": instance_id,
+                          "subdomain": subdomain,
+                          "url": f"https://{subdomain}.teai.io",
+                          "status": "active"
+                      }
+                  }), 201
+              except Exception as e:
+                  logger.error(f"Instance creation error: {e}")
+                  return jsonify({"success": False, "message": "Failed to create instance"}), 500
+
+          @app.route('/api/instances/<instance_id>', methods=['DELETE'])
+          def delete_instance(instance_id):
+              """インスタンスを削除"""
+              token = request.headers.get('Authorization', '').replace('Bearer ', '')
+              
+              if not token:
+                  return jsonify({"success": False, "message": "No token provided"}), 401
+              
+              db = get_db()
+              cursor = db.cursor()
+              
+              # トークンからユーザーIDを取得
+              cursor.execute(
+                  'SELECT user_id FROM sessions WHERE token = ? AND expires_at > CURRENT_TIMESTAMP',
+                  (token,)
+              )
+              session = cursor.fetchone()
+              
+              if not session:
+                  return jsonify({"success": False, "message": "Invalid or expired token"}), 401
+              
+              user_id = session['user_id']
+              
+              # インスタンスの所有者確認
+              cursor.execute(
+                  'SELECT id, subdomain FROM instances WHERE id = ? AND user_id = ?',
+                  (instance_id, user_id)
+              )
+              instance = cursor.fetchone()
+              
+              if not instance:
+                  return jsonify({"success": False, "message": "Instance not found or not owned by user"}), 404
+              
+              try:
+                  # ここで実際のインスタンスを削除するコードを追加
+                  # 例: AWS EC2インスタンスの終了など
+                  
+                  # データベースからインスタンスを削除
+                  cursor.execute('DELETE FROM instances WHERE id = ?', (instance_id,))
+                  db.commit()
+                  
+                  # Nginx設定を更新
+                  update_nginx_config()
+                  
+                  return jsonify({"success": True, "message": "Instance deleted successfully"}), 200
+              except Exception as e:
+                  logger.error(f"Instance deletion error: {e}")
+                  return jsonify({"success": False, "message": "Failed to delete instance"}), 500
+
+          if __name__ == '__main__':
+              # データベースの初期化
+              with app.app_context():
+                  init_db()
+              
+              # アプリケーションの起動
+              app.run(host='0.0.0.0', port=5000)
+          EOF
+
+          chmod +x /usr/local/bin/teai_api_server.py
+
+          # APIサーバーのサービス設定
+          cat > /etc/systemd/system/teai-api-server.service << 'EOF'
+          [Unit]
+          Description=TeAI API Server
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/local/bin/teai_api_server.py
+          Restart=always
+          User=root
+          Group=root
+          Environment=PATH=/usr/bin:/usr/local/bin
+          WorkingDirectory=/tmp
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          # Nginxの設定
+          cat > /etc/nginx/conf.d/teai.conf << 'EOF'
+          # TeAI サブドメイン対応リバースプロキシ設定
+
+          # ユーザーマッピング用のマップ
+          map $http_host $instance_id {
+              default "";
+              "~^(?<subdomain>.+)\.teai\.io$" $subdomain;
+          }
+
+          # インスタンスマッピング
+          map $instance_id $backend_server {
+              default "127.0.0.1:3000";  # デフォルトサーバー
+          }
+
+          # メインサイト用サーバー設定
+          server {
+              listen 80;
+              server_name teai.io www.teai.io;
+
+              # HTTPSにリダイレクト
+              return 301 https://$host$request_uri;
+          }
+
+          server {
+              listen 443 ssl;
+              server_name teai.io www.teai.io;
+
+              ssl_certificate /etc/letsencrypt/live/teai.io/fullchain.pem;
+              ssl_certificate_key /etc/letsencrypt/live/teai.io/privkey.pem;
+
+              # 文字エンコーディングの設定
+              charset utf-8;
+              source_charset utf-8;
+
+              # メインサイトのルート
+              root /var/www/teai.io;
+              index index.html;
+
+              # 静的ファイル
+              location /static/ {
+                  alias /var/www/teai.io/static/;
+                  expires 30d;
+              }
+
+              # API エンドポイント
+              location /api/ {
+                  proxy_pass http://127.0.0.1:5000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
+
+              # 認証エンドポイント
+              location = /auth {
+                  internal;
+                  proxy_pass http://127.0.0.1:5000/auth;
+                  proxy_pass_request_body off;
+                  proxy_set_header Content-Length "";
+                  proxy_set_header X-Original-URI $request_uri;
+              }
+
+              # その他のリクエスト
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+          }
+
+          # サブドメイン用サーバー設定
+          server {
+              listen 80;
+              server_name ~^(?<subdomain>.+)\.teai\.io$;
+
+              # HTTPSにリダイレクト
+              return 301 https://$host$request_uri;
+          }
+
+          server {
+              listen 443 ssl;
+              server_name ~^(?<subdomain>.+)\.teai\.io$;
+
+              ssl_certificate /etc/letsencrypt/live/teai.io/fullchain.pem;
+              ssl_certificate_key /etc/letsencrypt/live/teai.io/privkey.pem;
+
+              # 文字エンコーディングの設定
+              charset utf-8;
+              source_charset utf-8;
+
+              # サブドメインが存在するか確認
+              if ($backend_server = "") {
+                  return 404;
+              }
+
+              # プロキシ設定
+              location / {
+                  proxy_pass http://$backend_server;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+
+                  # WebSocketのサポート
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+
+                  # タイムアウト設定
+                  proxy_connect_timeout 300;
+                  proxy_send_timeout 300;
+                  proxy_read_timeout 300;
+                  send_timeout 300;
+              }
+          }
+          EOF
+
+          # ウェブサイトファイルのダウンロード
+          # index.html
+          cat > /var/www/teai.io/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>TeAI - AIによる開発支援プラットフォーム</title>
+              <link rel="stylesheet" href="/static/css/style.css">
+          </head>
+          <body>
+              <header>
+                  <div class="container">
+                      <nav class="navbar">
+                          <div class="logo">
+                              <img src="/static/images/teai-logo.png" alt="TeAI Logo">
+                              <h1>TeAI</h1>
+                          </div>
+                          <ul class="nav-links">
+                              <li><a href="#features">機能</a></li>
+                              <li><a href="#pricing">料金</a></li>
+                              <li><a href="#docs">ドキュメント</a></li>
+                              <li><a href="#about">会社情報</a></li>
+                              <li><a href="/login.html" class="btn">ログイン</a></li>
+                          </ul>
+                      </nav>
+                  </div>
+              </header>
+
+              <section class="hero">
+                  <div class="container">
+                      <h2>AIの手で、コーディングをもっと簡単に</h2>
+                      <p>TeAI（テアイ）は、AIを活用した開発支援プラットフォームです。コーディング、デバッグ、リファクタリングなど、開発者の日常的なタスクをAIがサポートします。</p>
+                      <a href="/register.html" class="btn">無料で始める</a>
+                  </div>
+              </section>
+
+              <section class="features" id="features">
+                  <div class="container">
+                      <div class="section-title">
+                          <h3>TeAIの主な機能</h3>
+                          <p>開発者の生産性を高める、TeAIの主な機能をご紹介します。</p>
+                      </div>
+                      <div class="feature-grid">
+                          <div class="feature-card">
+                              <div class="feature-icon">💻</div>
+                              <h4>コード生成</h4>
+                              <p>自然言語での指示からコードを生成します。アイデアを素早くコードに変換し、開発時間を短縮します。</p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">🐛</div>
+                              <h4>デバッグ支援</h4>
+                              <p>エラーの原因を特定し、修正案を提案します。複雑なバグも素早く解決できます。</p>
+                          </div>
+                          <div class="feature-card">
+                              <div class="feature-icon">🔄</div>
+                              <h4>リファクタリング</h4>
+                              <p>コードの品質向上のための提案と自動修正を行います。より読みやすく、メンテナンスしやすいコードに改善します。</p>
+                          </div>
+                      </div>
+                  </div>
+              </section>
+
+              <section class="cta">
+                  <div class="container">
+                      <h3>今すぐTeAIを試してみませんか？</h3>
+                      <p>無料プランで始めて、TeAIの機能を体験してください。</p>
+                      <a href="/register.html" class="btn btn-white">無料で始める</a>
+                  </div>
+              </section>
+
+              <footer>
+                  <div class="container">
+                      <div class="footer-content">
+                          <div class="footer-column">
+                              <h4>TeAI</h4>
+                              <ul>
+                                  <li><a href="#about">会社情報</a></li>
+                                  <li><a href="#contact">お問い合わせ</a></li>
+                              </ul>
+                          </div>
+                          <div class="footer-column">
+                              <h4>製品</h4>
+                              <ul>
+                                  <li><a href="#features">機能</a></li>
+                                  <li><a href="#pricing">料金</a></li>
+                              </ul>
+                          </div>
+                      </div>
+                      <div class="copyright">
+                          &copy; 2025 TeAI. All rights reserved.
+                      </div>
+                  </div>
+              </footer>
+          </body>
+          </html>
+          EOF
+
+          # CSSファイルの作成
+          mkdir -p /var/www/teai.io/static/css
+          cat > /var/www/teai.io/static/css/style.css << 'EOF'
+          :root {
+              --primary-color: #4285f4;
+              --secondary-color: #34a853;
+              --accent-color: #ea4335;
+              --text-color: #333;
+              --light-bg: #f8f9fa;
+              --dark-bg: #202124;
+          }
+          
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+          }
+          
+          body {
+              font-family: 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
+              color: var(--text-color);
+              background-color: white;
+          }
+          
+          header {
+              background-color: white;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+              position: fixed;
+              width: 100%;
+              z-index: 1000;
+          }
+          
+          .container {
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 0 20px;
+          }
+          
+          .navbar {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 15px 0;
+          }
+          
+          .logo {
+              display: flex;
+              align-items: center;
+          }
+          
+          .logo img {
+              height: 40px;
+              margin-right: 10px;
+          }
+          
+          .logo h1 {
+              font-size: 24px;
+              color: var(--primary-color);
+          }
+          
+          .nav-links {
+              display: flex;
+              list-style: none;
+          }
+          
+          .nav-links li {
+              margin-left: 30px;
+          }
+          
+          .nav-links a {
+              text-decoration: none;
+              color: var(--text-color);
+              font-weight: 500;
+              transition: color 0.3s;
+          }
+          
+          .nav-links a:hover {
+              color: var(--primary-color);
+          }
+          
+          .btn {
+              display: inline-block;
+              background-color: var(--primary-color);
+              color: white;
+              padding: 10px 20px;
+              border-radius: 5px;
+              text-decoration: none;
+              font-weight: 500;
+              transition: background-color 0.3s;
+          }
+          
+          .btn:hover {
+              background-color: #3367d6;
+          }
+          
+          .hero {
+              padding: 150px 0 100px;
+              text-align: center;
+              background-color: var(--light-bg);
+          }
+          
+          .hero h2 {
+              font-size: 48px;
+              margin-bottom: 20px;
+              color: var(--primary-color);
+          }
+          
+          .hero p {
+              font-size: 20px;
+              max-width: 800px;
+              margin: 0 auto 40px;
+              color: #666;
+          }
+          
+          .features {
+              padding: 100px 0;
+          }
+          
+          .section-title {
+              text-align: center;
+              margin-bottom: 60px;
+          }
+          
+          .section-title h3 {
+              font-size: 36px;
+              color: var(--primary-color);
+              margin-bottom: 20px;
+          }
+          
+          .section-title p {
+              font-size: 18px;
+              color: #666;
+              max-width: 700px;
+              margin: 0 auto;
+          }
+          
+          .feature-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 40px;
+          }
+          
+          .feature-card {
+              background-color: white;
+              border-radius: 10px;
+              box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+              padding: 30px;
+              transition: transform 0.3s, box-shadow 0.3s;
+          }
+          
+          .feature-card:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+          }
+          
+          .feature-icon {
+              font-size: 40px;
+              color: var(--primary-color);
+              margin-bottom: 20px;
+          }
+          
+          .feature-card h4 {
+              font-size: 22px;
+              margin-bottom: 15px;
+              color: var(--primary-color);
+          }
+          
+          .feature-card p {
+              color: #666;
+          }
+          
+          .cta {
+              background-color: var(--primary-color);
+              padding: 100px 0;
+              text-align: center;
+              color: white;
+          }
+          
+          .cta h3 {
+              font-size: 36px;
+              margin-bottom: 20px;
+          }
+          
+          .cta p {
+              font-size: 18px;
+              max-width: 700px;
+              margin: 0 auto 40px;
+          }
+          
+          .btn-white {
+              background-color: white;
+              color: var(--primary-color);
+          }
+          
+          .btn-white:hover {
+              background-color: #f1f1f1;
+          }
+          
+          footer {
+              background-color: var(--dark-bg);
+              color: white;
+              padding: 60px 0 30px;
+          }
+          
+          .footer-content {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 40px;
+              margin-bottom: 40px;
+          }
+          
+          .footer-column h4 {
+              font-size: 18px;
+              margin-bottom: 20px;
+              color: #f1f1f1;
+          }
+          
+          .footer-column ul {
+              list-style: none;
+          }
+          
+          .footer-column ul li {
+              margin-bottom: 10px;
+          }
+          
+          .footer-column a {
+              color: #aaa;
+              text-decoration: none;
+              transition: color 0.3s;
+          }
+          
+          .footer-column a:hover {
+              color: white;
+          }
+          
+          .copyright {
+              text-align: center;
+              padding-top: 30px;
+              border-top: 1px solid #444;
+              color: #aaa;
+              font-size: 14px;
+          }
+          
+          @media (max-width: 768px) {
+              .navbar {
+                  flex-direction: column;
+              }
+              
+              .nav-links {
+                  margin-top: 20px;
+              }
+              
+              .nav-links li {
+                  margin: 0 15px;
+              }
+              
+              .hero h2 {
+                  font-size: 36px;
+              }
+              
+              .hero p {
+                  font-size: 18px;
+              }
+              
+              .section-title h3 {
+                  font-size: 30px;
+              }
+          }
+          EOF
+
+          # ログインページとダッシュボードページをコピー
+          cp /var/www/teai.io/index.html /var/www/teai.io/login.html
+          cp /var/www/teai.io/index.html /var/www/teai.io/register.html
+          cp /var/www/teai.io/index.html /var/www/teai.io/dashboard.html
+
+          # TeAIコンテナの起動（一時的にOpenHandsのイメージを使用）
           docker run -d --rm \
-            -e SANDBOX_RUNTIME_CONTAINER_IMAGE=teai/runtime:latest \
+            -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.30-nikolaik \
             -e LOG_ALL_EVENTS=true \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /root/.teai-state:/.teai-state \
             -p 3000:3000 \
             --add-host host.docker.internal:host-gateway \
             --name teai-app \
-            teai/app:latest
+            docker.all-hands.dev/all-hands-ai/openhands:0.30
+
+          # サービスの起動
+          systemctl daemon-reload
+          systemctl enable teai-api-server
+          systemctl start teai-api-server
+
+          # Let's Encryptの証明書取得（実際のドメインが設定されている場合）
+          # certbot --nginx -d teai.io -d *.teai.io
 
           # 起動完了のマーク
           touch /tmp/teai_setup_complete
 
       Tags:
         - Key: Name
-          Value: TeAI
+          Value: TeAI-Main
+
+  # Route 53 レコードセット
+  TeAIDomainRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      TTL: 300
+      ResourceRecords:
+        - !GetAtt TeAIMainInstance.PublicIp
+
+  TeAIWildcardRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "*.${DomainName}"
+      Type: A
+      TTL: 300
+      ResourceRecords:
+        - !GetAtt TeAIMainInstance.PublicIp
 
 Mappings:
   RegionMap:
@@ -132,17 +1151,21 @@ Mappings:
 
 Outputs:
   InstanceId:
-    Description: TeAIインスタンスのID
-    Value: !Ref TeAIInstance
+    Description: TeAIメインインスタンスのID
+    Value: !Ref TeAIMainInstance
 
   PublicDNS:
-    Description: TeAIインスタンスのパブリックDNS
-    Value: !GetAtt TeAIInstance.PublicDnsName
+    Description: TeAIメインインスタンスのパブリックDNS
+    Value: !GetAtt TeAIMainInstance.PublicDnsName
 
   PublicIP:
-    Description: TeAIインスタンスのパブリックIP
-    Value: !GetAtt TeAIInstance.PublicIp
+    Description: TeAIメインインスタンスのパブリックIP
+    Value: !GetAtt TeAIMainInstance.PublicIp
 
   TeAIURL:
     Description: TeAIへのアクセスURL
-    Value: !Sub http://${TeAIInstance.PublicDnsName}:3000
+    Value: !Sub "https://${DomainName}"
+
+  TeAIWildcardURL:
+    Description: TeAIサブドメインのURL例
+    Value: !Sub "https://myteam.${DomainName}"

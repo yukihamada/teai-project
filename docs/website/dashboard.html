@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeAI - ダッシュボード</title>
+    <link rel="icon" href="images/favicon.ico">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #202124;
+            --border-color: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .dashboard {
+            padding: 120px 0 60px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-title h2 {
+            font-size: 28px;
+            color: var(--text-color);
+        }
+        
+        .dashboard-title p {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card-header h3 {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        .instance-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .instance-list th, .instance-list td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .instance-list th {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .instance-list tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .instance-list tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-provisioning {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .status-error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        .close {
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .empty-state-icon {
+            font-size: 60px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+        
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #323232;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 3000;
+            display: none;
+        }
+        
+        .toast-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .toast-error {
+            background-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="#" class="active">ダッシュボード</a></li>
+                    <li><a href="#" id="logout-btn">ログアウト</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <h2>インスタンス管理</h2>
+                    <p>TeAIのインスタンスを管理します</p>
+                </div>
+                <button class="btn" id="create-instance-btn">新しいインスタンスを作成</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>インスタンス一覧</h3>
+                </div>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>読み込み中...</p>
+                </div>
+                
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">🏝️</div>
+                    <h4>インスタンスがありません</h4>
+                    <p>新しいインスタンスを作成して、TeAIを始めましょう！</p>
+                    <button class="btn" id="empty-create-btn">インスタンスを作成</button>
+                </div>
+                
+                <table id="instance-list" class="instance-list" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>サブドメイン</th>
+                            <th>URL</th>
+                            <th>ステータス</th>
+                            <th>作成日時</th>
+                            <th>アクション</th>
+                        </tr>
+                    </thead>
+                    <tbody id="instance-table-body">
+                        <!-- インスタンスリストがここに動的に追加されます -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 新規インスタンス作成モーダル -->
+    <div id="create-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新しいインスタンスを作成</h3>
+                <button class="close">&times;</button>
+            </div>
+            <form id="create-instance-form">
+                <div class="form-group">
+                    <label for="subdomain">サブドメイン</label>
+                    <input type="text" id="subdomain" name="subdomain" placeholder="例: myteam" required>
+                    <div class="error-message" id="subdomain-error"></div>
+                    <p style="margin-top: 5px; color: #666; font-size: 14px;">
+                        サブドメインは3〜20文字の英数字で入力してください。<br>
+                        作成後のURLは <strong id="preview-url">myteam.teai.io</strong> となります。
+                    </p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary close-btn">キャンセル</button>
+                    <button type="submit" class="btn">作成</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 削除確認モーダル -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>インスタンスを削除</h3>
+                <button class="close">&times;</button>
+            </div>
+            <p>インスタンス <strong id="delete-subdomain"></strong> を削除してもよろしいですか？</p>
+            <p style="margin-top: 10px; color: #d32f2f;">この操作は取り消せません。</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary close-btn">キャンセル</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">削除</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- トースト通知 -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ユーティリティ関数
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast';
+            if (type) {
+                toast.classList.add(`toast-${type}`);
+            }
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ja-JP');
+        }
+        
+        // ページ読み込み時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // トークンの取得
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // インスタンス一覧の取得
+            fetchInstances();
+            
+            // 新規インスタンス作成ボタン
+            document.getElementById('create-instance-btn').addEventListener('click', function() {
+                document.getElementById('create-modal').style.display = 'flex';
+            });
+            
+            document.getElementById('empty-create-btn').addEventListener('click', function() {
+                document.getElementById('create-modal').style.display = 'flex';
+            });
+            
+            // モーダルを閉じるボタン
+            document.querySelectorAll('.close, .close-btn').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    document.getElementById('create-modal').style.display = 'none';
+                    document.getElementById('delete-modal').style.display = 'none';
+                });
+            });
+            
+            // サブドメインのプレビュー
+            document.getElementById('subdomain').addEventListener('input', function() {
+                document.getElementById('preview-url').textContent = `${this.value}.teai.io`;
+            });
+            
+            // 新規インスタンス作成フォームの送信
+            document.getElementById('create-instance-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const subdomain = document.getElementById('subdomain').value;
+                
+                // バリデーション
+                if (!/^[a-zA-Z0-9]{3,20}$/.test(subdomain)) {
+                    document.getElementById('subdomain-error').textContent = 'サブドメインは3〜20文字の英数字で入力してください。';
+                    document.getElementById('subdomain-error').style.display = 'block';
+                    return;
+                }
+                
+                createInstance(subdomain);
+            });
+            
+            // ログアウトボタン
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            });
+        });
+        
+        // インスタンス一覧の取得
+        function fetchInstances() {
+            const token = localStorage.getItem('token');
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('instance-list').style.display = 'none';
+            
+            fetch('/api/instances', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch instances');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.instances.length === 0) {
+                    document.getElementById('empty-state').style.display = 'block';
+                } else {
+                    document.getElementById('instance-list').style.display = 'table';
+                    renderInstances(data.instances);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showToast('インスタンス一覧の取得に失敗しました', 'error');
+                console.error('Error fetching instances:', error);
+            });
+        }
+        
+        // インスタンス一覧の表示
+        function renderInstances(instances) {
+            const tableBody = document.getElementById('instance-table-body');
+            tableBody.innerHTML = '';
+            
+            instances.forEach(instance => {
+                const row = document.createElement('tr');
+                
+                // ステータスに応じたクラス
+                let statusClass = '';
+                switch (instance.status) {
+                    case 'active':
+                        statusClass = 'status-active';
+                        break;
+                    case 'provisioning':
+                        statusClass = 'status-provisioning';
+                        break;
+                    default:
+                        statusClass = 'status-error';
+                }
+                
+                // ステータスに応じた日本語表示
+                let statusText = '';
+                switch (instance.status) {
+                    case 'active':
+                        statusText = '稼働中';
+                        break;
+                    case 'provisioning':
+                        statusText = '準備中';
+                        break;
+                    default:
+                        statusText = 'エラー';
+                }
+                
+                row.innerHTML = `
+                    <td>${instance.subdomain}</td>
+                    <td><a href="${instance.url}" target="_blank">${instance.url}</a></td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>${formatDate(instance.created_at)}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="window.open('${instance.url}', '_blank')">開く</button>
+                        <button class="btn btn-danger" onclick="showDeleteModal('${instance.id}', '${instance.subdomain}')">削除</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // 新規インスタンスの作成
+        function createInstance(subdomain) {
+            const token = localStorage.getItem('token');
+            
+            document.getElementById('create-modal').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            
+            fetch('/api/instances', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ subdomain })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'インスタンスの作成に失敗しました');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                showToast('インスタンスを作成しました', 'success');
+                fetchInstances();
+                
+                // フォームのリセット
+                document.getElementById('subdomain').value = '';
+                document.getElementById('preview-url').textContent = 'myteam.teai.io';
+                document.getElementById('subdomain-error').style.display = 'none';
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showToast(error.message, 'error');
+                console.error('Error creating instance:', error);
+            });
+        }
+        
+        // 削除確認モーダルの表示
+        function showDeleteModal(instanceId, subdomain) {
+            document.getElementById('delete-subdomain').textContent = subdomain;
+            document.getElementById('delete-modal').style.display = 'flex';
+            
+            // 削除ボタンのイベントリスナーを設定
+            document.getElementById('confirm-delete-btn').onclick = function() {
+                deleteInstance(instanceId);
+            };
+        }
+        
+        // インスタンスの削除
+        function deleteInstance(instanceId) {
+            const token = localStorage.getItem('token');
+            
+            document.getElementById('delete-modal').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            
+            fetch(`/api/instances/${instanceId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('インスタンスの削除に失敗しました');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                showToast('インスタンスを削除しました', 'success');
+                fetchInstances();
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showToast(error.message, 'error');
+                console.error('Error deleting instance:', error);
+            });
+        }
+    </script>
+</body>
+</html>

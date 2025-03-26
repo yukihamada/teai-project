@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeAI - 新規登録</title>
+    <link rel="icon" href="images/favicon.ico">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #202124;
+            --border-color: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .register-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo img {
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        .error-text {
+            color: var(--accent-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success-message {
+            color: var(--secondary-color);
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .back-link a:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <img src="images/teai-logo.png" alt="TeAI Logo">
+            <h1>TeAI</h1>
+        </div>
+        
+        <form id="register-form">
+            <div class="form-group">
+                <label for="username">ユーザー名</label>
+                <input type="text" id="username" name="username" required>
+                <div id="username-error" class="error-text">ユーザー名は3文字以上20文字以下で入力してください。</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">メールアドレス</label>
+                <input type="email" id="email" name="email" required>
+                <div id="email-error" class="error-text">有効なメールアドレスを入力してください。</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">パスワード</label>
+                <input type="password" id="password" name="password" required>
+                <div id="password-error" class="error-text">パスワードは8文字以上で入力してください。</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm-password">パスワード（確認）</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+                <div id="confirm-password-error" class="error-text">パスワードが一致しません。</div>
+            </div>
+            
+            <button type="submit" class="btn">登録</button>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>登録中...</p>
+            </div>
+            
+            <div id="error-message" class="error-message">
+                登録に失敗しました。もう一度お試しください。
+            </div>
+            
+            <div id="success-message" class="success-message">
+                登録が完了しました。<a href="login.html">ログイン</a>してください。
+            </div>
+        </form>
+        
+        <div class="login-link">
+            すでにアカウントをお持ちの方は <a href="login.html">ログイン</a>
+        </div>
+        
+        <div class="back-link">
+            <a href="index.html">トップページに戻る</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // すでにログイン済みの場合はダッシュボードにリダイレクト
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            const form = document.getElementById('register-form');
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            
+            // バリデーション関数
+            function validateUsername() {
+                const username = usernameInput.value;
+                const isValid = username.length >= 3 && username.length <= 20;
+                document.getElementById('username-error').style.display = isValid ? 'none' : 'block';
+                return isValid;
+            }
+            
+            function validateEmail() {
+                const email = emailInput.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const isValid = emailRegex.test(email);
+                document.getElementById('email-error').style.display = isValid ? 'none' : 'block';
+                return isValid;
+            }
+            
+            function validatePassword() {
+                const password = passwordInput.value;
+                const isValid = password.length >= 8;
+                document.getElementById('password-error').style.display = isValid ? 'none' : 'block';
+                return isValid;
+            }
+            
+            function validateConfirmPassword() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                const isValid = password === confirmPassword;
+                document.getElementById('confirm-password-error').style.display = isValid ? 'none' : 'block';
+                return isValid;
+            }
+            
+            // 入力フィールドのバリデーション
+            usernameInput.addEventListener('blur', validateUsername);
+            emailInput.addEventListener('blur', validateEmail);
+            passwordInput.addEventListener('blur', validatePassword);
+            confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+            
+            // フォーム送信
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // すべてのフィールドをバリデーション
+                const isUsernameValid = validateUsername();
+                const isEmailValid = validateEmail();
+                const isPasswordValid = validatePassword();
+                const isConfirmPasswordValid = validateConfirmPassword();
+                
+                // バリデーションに失敗した場合は送信しない
+                if (!isUsernameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
+                    return;
+                }
+                
+                // ローディング表示
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('success-message').style.display = 'none';
+                
+                // APIリクエスト
+                fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput.value,
+                        email: emailInput.value,
+                        password: passwordInput.value
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Registration failed');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.success) {
+                        // 登録成功
+                        document.getElementById('success-message').style.display = 'block';
+                        form.reset();
+                    } else {
+                        // 登録失敗
+                        document.getElementById('error-message').textContent = data.message || '登録に失敗しました。';
+                        document.getElementById('error-message').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error-message').textContent = error.message || '登録に失敗しました。';
+                    document.getElementById('error-message').style.display = 'block';
+                    console.error('Registration error:', error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
