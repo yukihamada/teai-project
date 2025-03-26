@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Te🖐️AI - よくある質問（FAQ）">
+    <title>よくある質問（FAQ） - Te🖐️AI</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+            --container-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .logo img {
+            height: 2.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main {
+            padding: 4rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .page-description {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--bg-light);
+        }
+
+        .faq-question svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .faq-item.active .faq-question svg {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+        }
+
+        .faq-answer p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .faq-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        .faq-categories {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .faq-category {
+            padding: 0.5rem 1rem;
+            background-color: white;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .faq-category:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-color);
+        }
+
+        .faq-category.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background-color: white;
+            padding: 4rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .contact-description {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: white;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 2rem;
+            margin-right: 0.75rem;
+        }
+
+        .footer-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-social-link {
+            width: 2.5rem;
+            height: 2.5rem;
+            background-color: var(--bg-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .footer-social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-social-link svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .footer-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-link a {
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .footer-link a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-link {
+            color: var(--text-light);
+        }
+
+        .footer-bottom-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 0;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .main {
+                padding: 3rem 0;
+            }
+
+            .contact-section {
+                padding: 3rem 0;
+                margin-top: 3rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                    Te🖐️AI
+                </a>
+                <div class="nav-links">
+                    <a href="#" class="nav-link">特徴</a>
+                    <a href="#" class="nav-link">料金</a>
+                    <a href="/faq.html" class="nav-link active">FAQ</a>
+                    <a href="#" class="nav-link">お問い合わせ</a>
+                    <a href="/login.html" class="nav-link">ログイン</a>
+                    <a href="/register.html" class="btn btn-primary">無料で始める</a>
+                </div>
+                <button class="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">よくある質問（FAQ）</h1>
+                <p class="page-description">Te🖐️AIに関するよくある質問と回答をまとめました。お探しの情報が見つからない場合は、お気軽にお問い合わせください。</p>
+            </div>
+
+            <div class="faq-categories">
+                <div class="faq-category active" data-category="all">すべて</div>
+                <div class="faq-category" data-category="general">一般的な質問</div>
+                <div class="faq-category" data-category="account">アカウント</div>
+                <div class="faq-category" data-category="billing">料金・支払い</div>
+                <div class="faq-category" data-category="technical">技術的な質問</div>
+                <div class="faq-category" data-category="security">セキュリティ</div>
+            </div>
+
+            <div class="faq-container">
+                <div class="faq-item" data-category="general">
+                    <div class="faq-question">
+                        Te🖐️AIとは何ですか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIは、オープンソースのAIエンジニアリングアシスタント「OpenHands」をクラウドで簡単に利用できるSaaSプラットフォームです。OpenHandsは、OpenDevinをベースにしており、さらにその元はDevin（AIエンジニア）です。</p>
+                        <p>Te🖐️AIを使用することで、複雑なセットアップや環境構築なしに、AIによるコード生成、デバッグ、テスト、デプロイなどの開発支援機能を利用できます。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="general">
+                    <div class="faq-question">
+                        Te🖐️AIは誰のために作られたものですか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIは、以下のような方々のために設計されています：</p>
+                        <p>・プログラマーやソフトウェア開発者<br>
+                        ・開発効率を向上させたいチーム<br>
+                        ・AIを活用したコーディング支援を求める方<br>
+                        ・OpenHandsやOpenDevinを簡単に利用したい方</p>
+                        <p>初心者から上級者まで、あらゆるレベルの開発者がTe🖐️AIの恩恵を受けることができます。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        アカウントの作成方法を教えてください。
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>アカウントの作成は簡単です。以下の手順に従ってください：</p>
+                        <p>1. トップページの「無料で始める」ボタンをクリック<br>
+                        2. 登録フォームに必要事項（ユーザー名、メールアドレス、パスワード）を入力<br>
+                        3. 「アカウント作成」ボタンをクリック<br>
+                        4. 登録したメールアドレスに確認メールが送信されるので、メール内のリンクをクリック<br>
+                        5. メールアドレスが確認されたら、ログインしてサービスを利用開始</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="account">
+                    <div class="faq-question">
+                        パスワードを忘れた場合はどうすればいいですか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>パスワードを忘れた場合は、以下の手順でリセットできます：</p>
+                        <p>1. ログインページの「パスワードをお忘れですか？」リンクをクリック<br>
+                        2. 登録したメールアドレスを入力<br>
+                        3. パスワードリセット用のリンクが記載されたメールが送信されるので、そのリンクをクリック<br>
+                        4. 新しいパスワードを設定して、再度ログイン</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        料金プランについて教えてください。
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIでは、以下の料金プランをご用意しています：</p>
+                        <p><strong>スタータープラン：</strong> ¥5,000/月<br>
+                        個人開発者や小規模プロジェクト向け。t3a.largeインスタンス、30GBストレージ、1ユーザー。</p>
+                        <p><strong>プロフェッショナルプラン：</strong> ¥15,000/月<br>
+                        プロフェッショナル開発者やチーム向け。t3a.xlargeインスタンス、100GBストレージ、5ユーザーまで。</p>
+                        <p><strong>エンタープライズプラン：</strong> 要問合せ<br>
+                        大規模チームや企業向け。カスタムインスタンス、無制限ストレージ、無制限ユーザー。</p>
+                        <p>すべてのプランで無料トライアル期間（14日間）をご利用いただけます。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="billing">
+                    <div class="faq-question">
+                        支払い方法は何がありますか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIでは、以下の支払い方法をサポートしています：</p>
+                        <p>・クレジットカード（Visa、Mastercard、American Express、JCB）<br>
+                        ・PayPal<br>
+                        ・銀行振込（年間契約の場合のみ）</p>
+                        <p>請求は月単位で行われ、毎月の利用開始日に自動的に更新されます。年間契約の場合は割引が適用されます。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="technical">
+                    <div class="faq-question">
+                        Te🖐️AIはどのようなプログラミング言語をサポートしていますか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIは、以下を含む多くのプログラミング言語をサポートしています：</p>
+                        <p>・Python<br>
+                        ・JavaScript/TypeScript<br>
+                        ・Java<br>
+                        ・C/C++<br>
+                        ・C#<br>
+                        ・Go<br>
+                        ・Ruby<br>
+                        ・PHP<br>
+                        ・Rust<br>
+                        ・Swift</p>
+                        <p>また、HTML、CSS、SQLなどのマークアップ言語やクエリ言語もサポートしています。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="technical">
+                    <div class="faq-question">
+                        Te🖐️AIを使用するための技術的な要件はありますか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIはクラウドベースのサービスであるため、最小限の技術要件で利用できます：</p>
+                        <p>・モダンなウェブブラウザ（Chrome、Firefox、Safari、Edgeの最新版）<br>
+                        ・安定したインターネット接続<br>
+                        ・JavaScript有効</p>
+                        <p>特別なソフトウェアのインストールや設定は不要です。すべての処理はクラウド上で行われます。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="security">
+                    <div class="faq-question">
+                        Te🖐️AIはデータをどのように保護していますか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIはデータセキュリティを最優先事項としています：</p>
+                        <p>・すべての通信はSSL/TLS暗号化を使用<br>
+                        ・データはAES-256暗号化を使用して保存<br>
+                        ・定期的なセキュリティ監査とペネトレーションテスト<br>
+                        ・AWS上の安全なインフラストラクチャを使用<br>
+                        ・厳格なアクセス制御と認証メカニズム</p>
+                        <p>また、プライバシーポリシーに従って、お客様のデータを第三者と共有することはありません。</p>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-category="security">
+                    <div class="faq-question">
+                        Te🖐️AIはコードの所有権をどのように扱いますか？
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Te🖐️AIを使用して生成または修正されたコードの所有権は、すべてお客様に帰属します。当社は、お客様のコードに対する所有権や知的財産権を主張することはありません。</p>
+                        <p>サービス改善のために匿名化された使用統計を収集することがありますが、お客様の明示的な許可なしにコードの内容を分析または使用することはありません。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="contact-section">
+        <div class="container">
+            <h2 class="contact-title">お探しの回答が見つかりませんでしたか？</h2>
+            <p class="contact-description">お気軽にお問い合わせください。サポートチームが喜んでお手伝いします。</p>
+            <a href="/contact.html" class="btn btn-primary">お問い合わせ</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="/" class="footer-logo">
+                        <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                        Te🖐️AI
+                    </a>
+                    <p class="footer-description">オープンソースのAIエンジニアリングアシスタント「OpenHands」をクラウドで簡単に利用できるSaaSプラットフォーム。</p>
+                    <div class="footer-social">
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="footer-social-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">製品</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">特徴</a></li>
+                        <li class="footer-link"><a href="#">料金</a></li>
+                        <li class="footer-link"><a href="/register.html">無料で始める</a></li>
+                        <li class="footer-link"><a href="/login.html">ログイン</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">リソース</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">ドキュメント</a></li>
+                        <li class="footer-link"><a href="#">ブログ</a></li>
+                        <li class="footer-link"><a href="/faq.html">よくある質問</a></li>
+                        <li class="footer-link"><a href="#">チュートリアル</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title">会社情報</h4>
+                    <ul class="footer-links">
+                        <li class="footer-link"><a href="#">会社概要</a></li>
+                        <li class="footer-link"><a href="#">お問い合わせ</a></li>
+                        <li class="footer-link"><a href="#">採用情報</a></li>
+                        <li class="footer-link"><a href="#">プレスキット</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2025 Te🖐️AI. All rights reserved.</div>
+                <div class="footer-bottom-links">
+                    <a href="#" class="footer-bottom-link">利用規約</a>
+                    <a href="#" class="footer-bottom-link">プライバシーポリシー</a>
+                    <a href="#" class="footer-bottom-link">クッキーポリシー</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const faqItem = question.parentElement;
+                    faqItem.classList.toggle('active');
+                });
+            });
+            
+            // FAQ Categories
+            const faqCategories = document.querySelectorAll('.faq-category');
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqCategories.forEach(category => {
+                category.addEventListener('click', () => {
+                    // Remove active class from all categories
+                    faqCategories.forEach(cat => cat.classList.remove('active'));
+                    
+                    // Add active class to clicked category
+                    category.classList.add('active');
+                    
+                    const selectedCategory = category.dataset.category;
+                    
+                    // Show/hide FAQ items based on category
+                    faqItems.forEach(item => {
+                        if (selectedCategory === 'all' || item.dataset.category === selectedCategory) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
