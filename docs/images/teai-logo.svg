@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text { font-family: Arial, sans-serif; font-weight: bold; }
+    .main-text { font-size: 60px; }
+    .sub-text { font-size: 20px; }
+  </style>
+  <circle cx="100" cy="100" r="90" fill="#4285f4" />
+  <circle cx="100" cy="100" r="80" fill="white" />
+  <text x="100" y="100" class="text main-text" text-anchor="middle" dominant-baseline="central" fill="#4285f4">TeAI</text>
+  <text x="100" y="140" class="text sub-text" text-anchor="middle" dominant-baseline="central" fill="#4285f4">手AI</text>
+</svg>
