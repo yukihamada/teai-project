@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeAI - AIによる開発支援プラットフォーム</title>
+    <link rel="icon" href="images/favicon.ico">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --accent-color: #ea4335;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #202124;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: white;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #3367d6;
+        }
+        
+        .hero {
+            padding: 150px 0 100px;
+            text-align: center;
+            background-color: var(--light-bg);
+        }
+        
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #666;
+        }
+        
+        .features {
+            padding: 100px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h3 {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .section-title p {
+            font-size: 18px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .feature-card p {
+            color: #666;
+        }
+        
+        .cta {
+            background-color: var(--primary-color);
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+        }
+        
+        .cta h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .btn-white {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .btn-white:hover {
+            background-color: #f1f1f1;
+        }
+        
+        footer {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #f1f1f1;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 20px;
+            }
+            
+            .nav-links li {
+                margin: 0 15px;
+            }
+            
+            .hero h2 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .section-title h3 {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="images/teai-logo.png" alt="TeAI Logo">
+                    <h1>TeAI</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">機能</a></li>
+                    <li><a href="#pricing">料金</a></li>
+                    <li><a href="#docs">ドキュメント</a></li>
+                    <li><a href="#about">会社情報</a></li>
+                    <li><a href="https://app.teai.io/login" class="btn">ログイン</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>AIの手で、コーディングをもっと簡単に</h2>
+            <p>TeAI（テアイ）は、AIを活用した開発支援プラットフォームです。コーディング、デバッグ、リファクタリングなど、開発者の日常的なタスクをAIがサポートします。</p>
+            <a href="https://app.teai.io/signup" class="btn">無料で始める</a>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h3>TeAIの主な機能</h3>
+                <p>開発者の生産性を高める、TeAIの主な機能をご紹介します。</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h4>コード生成</h4>
+                    <p>自然言語での指示からコードを生成します。アイデアを素早くコードに変換し、開発時間を短縮します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🐛</div>
+                    <h4>デバッグ支援</h4>
+                    <p>エラーの原因を特定し、修正案を提案します。複雑なバグも素早く解決できます。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>リファクタリング</h4>
+                    <p>コードの品質向上のための提案と自動修正を行います。より読みやすく、メンテナンスしやすいコードに改善します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h4>ドキュメント生成</h4>
+                    <p>コードからドキュメントを自動生成します。コメントやREADMEファイルの作成を効率化します。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎓</div>
+                    <h4>学習支援</h4>
+                    <p>プログラミング学習のためのガイダンスと説明を提供します。新しい言語やフレームワークの習得をサポートします。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h4>コードレビュー</h4>
+                    <p>コードの問題点や改善点を指摘します。品質の高いコードを維持するためのサポートを提供します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h3>今すぐTeAIを試してみませんか？</h3>
+            <p>無料プランで始めて、TeAIの機能を体験してください。チームプランやエンタープライズプランもご用意しています。</p>
+            <a href="https://app.teai.io/signup" class="btn btn-white">無料で始める</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>TeAI</h4>
+                    <ul>
+                        <li><a href="#about">会社情報</a></li>
+                        <li><a href="#blog">ブログ</a></li>
+                        <li><a href="#careers">採用情報</a></li>
+                        <li><a href="#contact">お問い合わせ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>製品</h4>
+                    <ul>
+                        <li><a href="#features">機能</a></li>
+                        <li><a href="#pricing">料金</a></li>
+                        <li><a href="#enterprise">エンタープライズ</a></li>
+                        <li><a href="#security">セキュリティ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>リソース</h4>
+                    <ul>
+                        <li><a href="#docs">ドキュメント</a></li>
+                        <li><a href="#tutorials">チュートリアル</a></li>
+                        <li><a href="#api">API リファレンス</a></li>
+                        <li><a href="#community">コミュニティ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>法的情報</h4>
+                    <ul>
+                        <li><a href="#terms">利用規約</a></li>
+                        <li><a href="#privacy">プライバシーポリシー</a></li>
+                        <li><a href="#cookies">Cookie ポリシー</a></li>
+                        <li><a href="#licenses">ライセンス</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 TeAI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
