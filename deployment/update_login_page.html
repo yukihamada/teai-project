@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Te🖐️AI - ログイン">
+    <title>ログイン - Te🖐️AI</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --accent-color: #f43f5e;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #ffffff;
+            --bg-light: #f8fafc;
+            --bg-dark: #0f172a;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-github {
+            background-color: #24292e;
+            color: white;
+        }
+
+        .btn-github:hover {
+            background-color: #000000;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-icon {
+            margin-right: 0.75rem;
+        }
+
+        /* Header */
+        .header {
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .logo img {
+            height: 2.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 400px;
+            padding: 2.5rem;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .login-subtitle {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+        }
+
+        .form-check-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .forgot-password {
+            font-size: 0.875rem;
+        }
+
+        .login-button {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .login-divider-text {
+            padding: 0 1rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-danger {
+            background-color: rgba(244, 63, 94, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: white;
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-link {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 0;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .login-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <img src="/static/images/teai-logo.png" alt="Te🖐️AI Logo">
+                    Te🖐️AI
+                </a>
+                <div class="nav-links">
+                    <a href="/#features" class="nav-link">特徴</a>
+                    <a href="/#pricing" class="nav-link">料金</a>
+                    <a href="/faq.html" class="nav-link">FAQ</a>
+                    <a href="/contact.html" class="nav-link">お問い合わせ</a>
+                    <a href="/login.html" class="nav-link active">ログイン</a>
+                    <a href="/register.html" class="btn btn-primary">無料で始める</a>
+                </div>
+                <button class="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1 class="login-title">ログイン</h1>
+                    <p class="login-subtitle">アカウントにログインして、Te🖐️AIを始めましょう</p>
+                </div>
+                <div id="login-error" class="alert alert-danger" style="display: none;"></div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">ユーザー名</label>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">パスワード</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-footer">
+                        <div class="form-check">
+                            <input type="checkbox" id="remember" name="remember" class="form-check-input">
+                            <label for="remember" class="form-check-label">ログイン状態を保持</label>
+                        </div>
+                        <a href="/forgot-password.html" class="forgot-password">パスワードをお忘れですか？</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary login-button">ログイン</button>
+                </form>
+                <div class="login-divider">
+                    <span class="login-divider-text">または</span>
+                </div>
+                <div class="social-login">
+                    <a href="/api/auth/github" class="btn btn-github">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="btn-icon" viewBox="0 0 16 16">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        GitHubでログイン
+                    </a>
+                </div>
+                <div class="register-link">
+                    アカウントをお持ちでない方は <a href="/register.html">新規登録</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-copyright">&copy; 2025 Te🖐️AI. All rights reserved.</div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">利用規約</a>
+                    <a href="#" class="footer-link">プライバシーポリシー</a>
+                    <a href="#" class="footer-link">クッキーポリシー</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            const token = localStorage.getItem('teai_token');
+            if (token) {
+                // Verify token validity
+                fetch('/auth', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/dashboard.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    localStorage.removeItem('teai_token');
+                    localStorage.removeItem('teai_user');
+                });
+            }
+            
+            // Handle login form submission
+            const loginForm = document.getElementById('login-form');
+            const loginError = document.getElementById('login-error');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('teai_token', data.token);
+                        localStorage.setItem('teai_user', JSON.stringify(data.user));
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        loginError.textContent = data.message || 'ログインに失敗しました。';
+                        loginError.style.display = 'block';
+                        
+                        if (data.needsVerification) {
+                            // Show verification message and option to resend verification email
+                            loginError.innerHTML = `メールアドレスの確認が必要です。 <a href="#" id="resend-verification" data-user-id="${data.userId}">確認メールを再送信</a>`;
+                            
+                            document.getElementById('resend-verification').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const userId = this.getAttribute('data-user-id');
+                                
+                                fetch('/api/resend-verification', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        userId: userId
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        loginError.textContent = '確認メールを再送信しました。メールをご確認ください。';
+                                    } else {
+                                        loginError.textContent = data.message || '確認メールの再送信に失敗しました。';
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    loginError.textContent = '確認メールの再送信中にエラーが発生しました。';
+                                });
+                            });
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loginError.textContent = 'ログイン中にエラーが発生しました。';
+                    loginError.style.display = 'block';
+                });
+            });
+            
+            // Check for auth callback
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (token) {
+                // Store token and redirect
+                localStorage.setItem('teai_token', token);
+                
+                // Get user info
+                fetch('/auth', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('teai_user', JSON.stringify(data.user));
+                        window.location.href = '/dashboard.html';
+                    } else {
+                        loginError.textContent = 'ユーザー情報の取得に失敗しました。';
+                        loginError.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loginError.textContent = 'ユーザー情報の取得中にエラーが発生しました。';
+                    loginError.style.display = 'block';
+                });
+            }
+            
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
