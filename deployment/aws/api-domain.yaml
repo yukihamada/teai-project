@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'TeAI API Custom Domain'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Environment (dev, test, prod)
+    
+  DomainName:
+    Type: String
+    Description: Domain name for the API (e.g., teai.io)
+    
+  SubDomain:
+    Type: String
+    Description: Subdomain for the environment (e.g., dev-api, test-api, api)
+    
+  HostedZoneId:
+    Type: String
+    Description: Route 53 Hosted Zone ID
+    
+  AcmCertificateArn:
+    Type: String
+    Description: ARN of the ACM certificate for the domain
+    
+  ApiId:
+    Type: String
+    Description: ID of the API Gateway REST API
+    
+  ApiStageName:
+    Type: String
+    Description: Name of the API Gateway stage
+
+Resources:
+  # API Gateway Custom Domain
+  ApiDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: !Sub ${SubDomain}.${DomainName}
+      RegionalCertificateArn: !Ref AcmCertificateArn
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # API Gateway Base Path Mapping
+  ApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref ApiId
+      Stage: !Ref ApiStageName
+
+  # Route 53 Record for API
+  ApiDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub ${SubDomain}.${DomainName}.
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt ApiDomain.RegionalHostedZoneId
+        EvaluateTargetHealth: false
+
+Outputs:
+  ApiDomainName:
+    Description: Custom domain name for the API
+    Value: !Sub ${SubDomain}.${DomainName}
+    Export:
+      Name: !Sub TeAIApiDomain-${Environment}
+      
+  ApiUrl:
+    Description: URL of the API
+    Value: !Sub https://${SubDomain}.${DomainName}
+    Export:
+      Name: !Sub TeAIApiUrl-${Environment}
