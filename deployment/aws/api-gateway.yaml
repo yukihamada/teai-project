@@ -1,0 +1,319 @@
+openapi: 3.0.1
+info:
+  title: TeAI API
+  description: API for TeAI
+  version: 1.0.0
+paths:
+  /auth/signup:
+    post:
+      summary: Sign up a new user
+      operationId: signUp
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: User registered successfully
+        '400':
+          description: Bad request
+    options:
+      summary: CORS support
+      operationId: authSignUpOptions
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+  /auth/signin:
+    post:
+      summary: Sign in a user
+      operationId: signIn
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: User authenticated successfully
+        '401':
+          description: Unauthorized
+    options:
+      summary: CORS support
+      operationId: authSignInOptions
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+  /auth/user:
+    get:
+      summary: Get user information
+      operationId: getUser
+      security:
+        - CognitoAuthorizer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: User information retrieved successfully
+        '401':
+          description: Unauthorized
+    options:
+      summary: CORS support
+      operationId: authUserOptions
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-auth/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+  /instances:
+    get:
+      summary: List instances
+      operationId: listInstances
+      security:
+        - CognitoAuthorizer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instances retrieved successfully
+        '401':
+          description: Unauthorized
+    post:
+      summary: Create a new instance
+      operationId: createInstance
+      security:
+        - CognitoAuthorizer: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance created successfully
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    options:
+      summary: CORS support
+      operationId: instancesOptions
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+  /instances/{id}:
+    get:
+      summary: Get instance by ID
+      operationId: getInstance
+      security:
+        - CognitoAuthorizer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance retrieved successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Instance not found
+    put:
+      summary: Update instance by ID
+      operationId: updateInstance
+      security:
+        - CognitoAuthorizer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance updated successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Instance not found
+    delete:
+      summary: Delete instance by ID
+      operationId: deleteInstance
+      security:
+        - CognitoAuthorizer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Instance not found
+          
+  /instances/{id}/start:
+    post:
+      summary: Start instance by ID
+      operationId: startInstance
+      security:
+        - CognitoAuthorizer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance started successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Instance not found
+    options:
+      summary: CORS support
+      operationId: instanceStartOptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+          
+  /instances/{id}/stop:
+    post:
+      summary: Stop instance by ID
+      operationId: stopInstance
+      security:
+        - CognitoAuthorizer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: Instance stopped successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Instance not found
+    options:
+      summary: CORS support
+      operationId: instanceStopOptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+    options:
+      summary: CORS support
+      operationId: instanceIdOptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-amazon-apigateway-integration:
+        uri: arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-northeast-1:495350830663:function:teai-instances/invocations
+        passthroughBehavior: when_no_match
+        httpMethod: POST
+        type: aws_proxy
+      responses:
+        '200':
+          description: CORS support
+components:
+  securitySchemes:
+    CognitoAuthorizer:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - arn:aws:cognito-idp:ap-northeast-1:495350830663:userpool/ap-northeast-1_wwnIacApg
