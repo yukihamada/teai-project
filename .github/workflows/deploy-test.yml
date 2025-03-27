@@ -1,0 +1,76 @@
+name: Deploy to Test
+
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - 'deployment/aws/**'
+      - '.github/workflows/deploy-test.yml'
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "yes" to confirm deployment to test environment'
+        required: true
+        default: 'no'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: test
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm == 'yes' || github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+          
+      - name: Install dependencies
+        run: |
+          cd deployment/aws/lambda
+          npm install
+          
+      - name: Deploy to AWS
+        run: |
+          cd deployment/aws
+          chmod +x deploy.sh
+          ./deploy.sh test
+          
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm install
+          TEAI_ENV=test npm run build
+          
+      - name: Deploy frontend to S3
+        run: |
+          aws s3 sync frontend/build/ s3://teai-website-test/ --delete
+          
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.TEST_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+          
+      - name: Notify deployment success
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { repo, owner } = context.repo;
+            const commit = context.sha.substring(0, 7);
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner,
+              repo,
+              body: `✅ Test environment has been deployed successfully with commit ${commit}.\n\nAPI URL: https://${{ secrets.TEST_API_DOMAIN }}\nWebsite: https://${{ secrets.TEST_WEBSITE_DOMAIN }}`
+            })
