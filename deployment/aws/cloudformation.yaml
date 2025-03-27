@@ -1,0 +1,468 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'TeAI Infrastructure'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Environment (dev, test, prod)
+    
+  NodeEnv:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - test
+      - production
+    Description: Node.js environment (development, test, production)
+
+Resources:
+  # Cognito User Pool
+  TeAIUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub teai-users-${Environment}
+      AutoVerifiedAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+        - Name: name
+          Required: true
+          Mutable: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # Cognito User Pool Client
+  TeAIUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub teai-client-${Environment}
+      UserPoolId: !Ref TeAIUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  # DynamoDB Tables
+  TeAIProfilesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub teai-profiles-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  TeAIInstancesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub teai-instances-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: UserIdIndex
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # IAM Role for Lambda Functions
+  TeAILambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: TeAILambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource:
+                  - !GetAtt TeAIProfilesTable.Arn
+                  - !GetAtt TeAIInstancesTable.Arn
+                  - !Join ['', [!GetAtt TeAIInstancesTable.Arn, '/index/*']]
+              - Effect: Allow
+                Action:
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminGetUser
+                  - cognito-idp:AdminInitiateAuth
+                  - cognito-idp:AdminRespondToAuthChallenge
+                  - cognito-idp:SignUp
+                  - cognito-idp:InitiateAuth
+                  - cognito-idp:GetUser
+                Resource: !GetAtt TeAIUserPool.Arn
+              - Effect: Allow
+                Action:
+                  - ec2:RunInstances
+                  - ec2:DescribeInstances
+                  - ec2:TerminateInstances
+                Resource: '*'
+
+  # Lambda Functions
+  TeAIAuthFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub teai-auth-${Environment}
+      Runtime: nodejs18.x
+      Handler: auth.handler
+      Role: !GetAtt TeAILambdaRole.Arn
+      Code:
+        S3Bucket: !Sub teai-lambda-code-${Environment}
+        S3Key: auth.zip
+      Environment:
+        Variables:
+          USER_POOL_ID: !Ref TeAIUserPool
+          CLIENT_ID: !Ref TeAIUserPoolClient
+          PROFILES_TABLE: !Ref TeAIProfilesTable
+          NODE_ENV: !Ref NodeEnv
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  TeAIInstancesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub teai-instances-${Environment}
+      Runtime: nodejs18.x
+      Handler: instances.handler
+      Role: !GetAtt TeAILambdaRole.Arn
+      Code:
+        S3Bucket: !Sub teai-lambda-code-${Environment}
+        S3Key: instances.zip
+      Environment:
+        Variables:
+          INSTANCES_TABLE: !Ref TeAIInstancesTable
+          PROFILES_TABLE: !Ref TeAIProfilesTable
+          NODE_ENV: !Ref NodeEnv
+          EC2_IMAGE_ID: ami-0d52744d6551d851e
+          EC2_INSTANCE_TYPE: t3a.large
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # API Gateway
+  TeAIApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub TeAI API ${Environment}
+      Description: !Sub API for TeAI ${Environment} environment
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  # API Gateway Deployment
+  TeAIApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - TeAIAuthSignUpMethod
+      - TeAIAuthSignInMethod
+      - TeAIAuthUserMethod
+      - TeAIInstancesListMethod
+      - TeAIInstancesCreateMethod
+      - TeAIInstancesGetMethod
+      - TeAIInstancesUpdateMethod
+      - TeAIInstancesDeleteMethod
+      - TeAIInstancesStartMethod
+      - TeAIInstancesStopMethod
+    Properties:
+      RestApiId: !Ref TeAIApi
+      StageName: !Ref Environment
+
+  # API Gateway Resources
+  TeAIAuthResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !GetAtt TeAIApi.RootResourceId
+      PathPart: auth
+
+  TeAIAuthSignUpResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIAuthResource
+      PathPart: signup
+
+  TeAIAuthSignInResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIAuthResource
+      PathPart: signin
+
+  TeAIAuthUserResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIAuthResource
+      PathPart: user
+
+  TeAIInstancesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !GetAtt TeAIApi.RootResourceId
+      PathPart: instances
+
+  TeAIInstancesIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIInstancesResource
+      PathPart: '{id}'
+      
+  TeAIInstancesIdStartResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIInstancesIdResource
+      PathPart: start
+      
+  TeAIInstancesIdStopResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ParentId: !Ref TeAIInstancesIdResource
+      PathPart: stop
+
+  # API Gateway Methods
+  TeAIAuthSignUpMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIAuthSignUpResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIAuthFunction.Arn}/invocations
+
+  TeAIAuthSignInMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIAuthSignInResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIAuthFunction.Arn}/invocations
+
+  TeAIAuthUserMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIAuthUserResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIAuthFunction.Arn}/invocations
+
+  TeAIInstancesListMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+
+  TeAIInstancesCreateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+
+  TeAIInstancesGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesIdResource
+      HttpMethod: GET
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+
+  TeAIInstancesUpdateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesIdResource
+      HttpMethod: PUT
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+
+  TeAIInstancesDeleteMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesIdResource
+      HttpMethod: DELETE
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+        
+  TeAIInstancesStartMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesIdStartResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+        
+  TeAIInstancesStopMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref TeAIApi
+      ResourceId: !Ref TeAIInstancesIdStopResource
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizerId: !Ref TeAIApiAuthorizer
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TeAIInstancesFunction.Arn}/invocations
+
+  # API Gateway Authorizer
+  TeAIApiAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: TeAIAuthorizer
+      RestApiId: !Ref TeAIApi
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.Authorization
+      ProviderARNs:
+        - !GetAtt TeAIUserPool.Arn
+
+  # Lambda Permissions
+  TeAIAuthFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref TeAIAuthFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TeAIApi}/*
+
+  TeAIInstancesFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref TeAIInstancesFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${TeAIApi}/*
+
+Outputs:
+  UserPoolId:
+    Description: ID of the Cognito User Pool
+    Value: !Ref TeAIUserPool
+    Export:
+      Name: !Sub TeAIUserPoolId-${Environment}
+
+  UserPoolClientId:
+    Description: ID of the Cognito User Pool Client
+    Value: !Ref TeAIUserPoolClient
+    Export:
+      Name: !Sub TeAIUserPoolClientId-${Environment}
+
+  ApiEndpoint:
+    Description: URL of the API Gateway endpoint
+    Value: !Sub https://${TeAIApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+    Export:
+      Name: !Sub TeAIApiEndpoint-${Environment}
+      
+  ApiId:
+    Description: ID of the API Gateway
+    Value: !Ref TeAIApi
+    Export:
+      Name: !Sub TeAIApiId-${Environment}
+      
+  ProfilesTable:
+    Description: Name of the Profiles DynamoDB table
+    Value: !Ref TeAIProfilesTable
+    Export:
+      Name: !Sub TeAIProfilesTable-${Environment}
+      
+  InstancesTable:
+    Description: Name of the Instances DynamoDB table
+    Value: !Ref TeAIInstancesTable
+    Export:
+      Name: !Sub TeAIInstancesTable-${Environment}
+      
+  Environment:
+    Description: Deployment environment
+    Value: !Ref Environment
+    Export:
+      Name: !Sub TeAIEnvironment-${Environment}

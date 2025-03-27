@@ -1,0 +1,10 @@
+{
+  "name": "teai-lambda-functions",
+  "version": "1.0.0",
+  "description": "Lambda functions for TeAI",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1550.0",
+    "uuid": "^9.0.1"
+  }
+}
